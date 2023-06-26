@@ -54,18 +54,28 @@
 			<v-card-text class="font-weight-bold">Host User ID</v-card-text>
 			<v-card-text>{{ getRoom().hostUserId }}</v-card-text>
 		</v-card>
+		
+		<v-spacer></v-spacer>
+		<Comment />
 	</v-container>
 </template>
 
 <script>
+import Comment from '@/views/Comment.vue';
+import axios from 'axios';
+
 export default {
 	name: 'RoomDetail',
 	data() {
 		return {
 		};
 	},
+	components: {
+		Comment
+	},
 	mounted() {
 		this.getRoom();
+		this.getCommentListApi();
 	},
 	methods: {
 		formatDate(dateString) {
@@ -74,8 +84,33 @@ export default {
 		},
 		getRoom() { 
 			const roomId = this.$route.params.id;
+
 			return this.$store.getters['room/getRoom'];
 
+		},
+		async getCommentListApi() { 
+			try {
+				const roomId = this.$route.params.id;
+				let commentAxios = (await axios(`https://jsonplaceholder.typicode.com/comments?postId=` + roomId)).data
+				console.log({ commentAxios })
+				// console.log({ commentAxios })
+				const commentList = commentAxios.map((comment, idx) => 
+					({
+					id: comment.id,
+					content: comment.body,
+					rating: comment.id,
+					name : comment.email
+						 
+					})
+				)
+
+
+				this.$store
+					.dispatch('comment/setCommentList', commentList)
+				
+			} catch (e) { 
+				console.error("error axios commentList = ", e);
+			}
 		}
 	}
 };
