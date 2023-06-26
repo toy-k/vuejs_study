@@ -2,8 +2,8 @@ const commentModule = {
   namespaced: true,
 	state() {
 		return {
-			comment: 2,
-			commentList: [2,2,2],
+			comment: null,
+			commentList: [],
 		}
 	},  mutations: {
 		setComment(state, payload) {

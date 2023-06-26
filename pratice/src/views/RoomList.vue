@@ -99,16 +99,16 @@ export default {
 
 		async getRoomList() { 
 			let roomListAxios = (await axios(`http://jsonplaceholder.typicode.com/posts?_limit=33`)).data //array
-
-			let photoAxios = (await axios(`https://jsonplaceholder.typicode.com/photos?albumId=1&_limit=33`)).data;
-
+			
+			let photos = (await axios("https://picsum.photos/v2/list?limit=33")).data; //array
+			
 			let roomList = roomListAxios.map((room, idx) => 
 				({
-					...room, img: photoAxios[idx].url,
+				...room, img: photos[idx].download_url,
 				})
 			)
 
-			this.$store.dispatch('room/setRoomList', roomList);
+			await this.$store.dispatch('room/setRoomList', roomList);
 		}
 	}, 
 	beforeMount() {

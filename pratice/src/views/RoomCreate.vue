@@ -3,19 +3,18 @@
 		<h1>Write a New Post</h1>
 		<v-card>
 			<v-card-text>
-				<v-form @submit.prevent="submitForm">
-					<v-text-field v-model="postData.title" label="Title"></v-text-field>
-					<v-textarea v-model="postData.description" label="Description"></v-textarea>
-					<v-select v-model="postData.category" :items="categoryOptions" label="Category"></v-select>
-					<v-text-field v-model="postData.location" label="Location"></v-text-field>
-					<v-text-field type="date" label="Date" v-model="postData.meetupStartDate" ></v-text-field>
-					<v-text-field type="date" label="Date" v-model="postData.meetupEndDate" ></v-text-field>
-					<v-text-field v-model="postData.maxJoinNumber" label="Max Join Number"></v-text-field>
-					<v-text-field v-model="postData.price" label="Price"></v-text-field>
-					<v-select v-model="postData.roomStatus" :items="roomStatusOptions" label="Room Status"></v-select>
-					<v-select v-model="postData.roomType" :items="roomTypeOptions" label="Room Type"></v-select>
-					<v-text-field v-model="postData.meetupPhotoPath" label="Meetup Photo Path"></v-text-field>
-					<v-text-field v-model="postData.hostUserId" label="Host User ID"></v-text-field>
+				<v-form ref="form" @submit.prevent="submitForm" @validate="isValidateForm">
+					<v-text-field v-model="postData.title" label="Title" :rules="rules" ></v-text-field>
+					<v-textarea v-model="postData.description" label="Description" :rules="rules"></v-textarea>
+					<v-select v-model="postData.category" :items="categoryOptions" label="Category" :rules="rules"></v-select>
+					<v-text-field v-model="postData.location" label="Location" :rules="rules"></v-text-field>
+					<v-text-field type="date" label="Date" v-model="postData.meetupStartDate"  :rules="rules"></v-text-field>
+					<v-text-field type="date" label="Date" v-model="postData.meetupEndDate"  :rules="rules"></v-text-field>
+					<v-text-field v-model="postData.maxJoinNumber" label="Max Join Number" :rules="rules"></v-text-field>
+					<v-text-field v-model="postData.price" label="Price" :rules="rules"></v-text-field>
+					<v-select v-model="postData.roomType" :items="roomTypeOptions" label="Room Type" :rules="rules"></v-select>
+					<v-text-field v-model="postData.meetupPhotoPath" label="Meetup Photo Path" :rules="rules"></v-text-field>
+					<v-text-field v-model="postData.hostUserId" label="Host User ID" :rules="rules"></v-text-field>
 					<v-file-input v-model="postData.file" label="Meetup file" ></v-file-input>
 					<v-file-input v-model="postData.file" label="Meetup Photo" accept="image/*"></v-file-input>
 						<v-btn color="primary" type="submit">Submit</v-btn>
@@ -26,6 +25,9 @@
 </template>
 
 <script>
+
+import axios from 'axios';
+
 export default {
 	data() {
 		return {
@@ -38,7 +40,6 @@ export default {
 				meetupEndDate: null,
 				maxJoinNumber: null,
 				price: null,
-				roomStatus: '',
 				roomType: '',
 				meetupPhotoPath: '',
 				file: null, // Added file property for file upload
@@ -50,15 +51,42 @@ export default {
 				'ALCOHOL', 'ACTIVITY', 'CULTURE', 'SPORTS', 'ETC'
 			],
 			roomTypeOptions: ['Online', 'Offline'],
-			roomStatusOptions: ['OPEN', 'CLOSED']
+			roomStatusOptions: ['OPEN', 'CLOSED'],
+			  rules: [
+				value => {
+					if (value) return true
+
+					return 'You must enter a value'
+				},
+			],
 		};
 	},
 	methods: {
-		submitForm() {
-			// Perform form submission logic here
-			// Send the postData object to the server
-			console.log('Form Data:', this.postData);
-			// Clear form fields after submission
+		isValidateForm() {
+			return this.$refs.form.validate()
+		},
+		async submitForm() {
+			console.log(await this.isValidateForm())
+			if ((await this.isValidateForm()).valid == false) { 
+				console.error("Validation Error");
+				return;
+			}
+
+			const headers = {
+				'Content-Type': 'application/json; charset=UTF-8',
+				'Authorization': 'Bearer YourAccessToken'
+			};
+			try {
+				const createdPost = await axios.post('https://jsonplaceholder.typicode.com/posts', this.postData, { headers })
+				const createdRoom = createdPost.data;
+				await this.$store.dispatch('room/setCreatedRoom', createdRoom);
+
+				this.$router.push('/main-page');
+
+			} catch (e) { 
+				console.log("API POST ERROR: ", e);
+			}
+
 			this.postData = {
 				title: '',
 				description: '',
@@ -72,9 +100,10 @@ export default {
 				roomType: '',
 				meetupPhotoPath: '',
 				file: null,
-				 photoFile:null,
+				photoFile: null,
 				hostUserId: null
 			};
+
 		}
 	}
 };
