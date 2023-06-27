@@ -14,12 +14,12 @@
 		        >
 		          <v-list-item-title>{{ item.title }}</v-list-item-title>
 		        </v-list-item>
-							<v-btn block color="secondary" variant='outlined' class="mt-4 py-4">Logout</v-btn>
+							<v-btn block color="error" variant='outlined' class="mt-4 py-4">Logout</v-btn>
 			      </v-list>
 		    </v-menu>
 
 			<v-spacer />
-		
+		<div v-if="isLoggedIn">
 			<v-menu>
 	      <template v-slot:activator="{ props }">
 	        <v-btn
@@ -40,9 +40,14 @@
 	        >
 	          <v-list-item-title>{{ item.title }}</v-list-item-title>
 	        </v-list-item>
-						<v-btn block color="secondary" variant='outlined' class="mt-4 py-4">Logout</v-btn>
+						<v-btn block color="secondary" variant='outlined' class="mt-4 py-4" @click="logout">Logout</v-btn>
 		      </v-list>
 	    </v-menu>
+		</div>
+		<div v-else>
+			<v-btn color="error" class="mr-4" to="/sign-in">sign in</v-btn>
+		</div>
+
 
 
 	</v-app-bar>
@@ -69,5 +74,16 @@ export default ({
 			},
 		]
 	}),
+	computed: {
+		isLoggedIn() { 
+			return this.$store.getters['auth/isAuthenticated'];
+		}
+	},
+	methods: {
+		logout() { 
+			this.$store.dispatch('auth/logout');
+			this.$router.replace('/main-page');
+		}
+	}
 })
 </script>

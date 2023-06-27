@@ -5,6 +5,7 @@ const roomModule = {
 			room: null,
 			roomList: [],
 			createdRoom: null,
+			count: 0,
 		}
 	},
 	mutations: {
@@ -16,6 +17,9 @@ const roomModule = {
 		},
 		setCreatedRoom(state, payload) {
 			state.createdRoom = payload;
+		},
+		setCount(state, payload) {
+			state.count = payload;
 		}
 	},
 	actions: {
@@ -27,12 +31,16 @@ const roomModule = {
 		},
 		setCreatedRoom(context, payload) {
 			context.commit('setCreatedRoom', payload);
+		},
+		setCount(context, payload) {
+			context.commit('setCount', payload);
 		}
 	},
 	getters: {
 		getRoom(state) {return state.room;},
 		getRoomList(state) { return state.roomList; },
 		getCreatedRoom(state) { return state.createdRoom; },
+		getCount(state) { return state.count; },
 	}
 }
 

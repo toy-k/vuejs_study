@@ -13,11 +13,13 @@ app.use(store)
 app.use(vuetify)
 
 const savedState = JSON.parse(localStorage.getItem('state'));
+console.log(savedState)
 if (savedState) {
 	store.replaceState(savedState);
 }
 
 window.addEventListener('beforeunload', () => {
+	console.log(JSON.stringify(store.state))
 	localStorage.setItem('state', JSON.stringify(store.state));
 });
 

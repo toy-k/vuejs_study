@@ -22,7 +22,7 @@
 				</v-card>
 			</v-col>
 		</v-row>
-		<v-pagination v-model="currentPage" :length="totalPages" @input="setCurrentPage" color="primary"></v-pagination>
+		<v-pagination v-model="currentPage" :length="totalPages" color="primary"></v-pagination>
 	</v-container>
 </template>
 
@@ -33,30 +33,38 @@ export default {
 	name: 'BlogCard',
 
 	data: () => ({
-		categories: ['STUDY', 'TRAVEL', 'CODING', 'FOOD', 'GAME', 'CAFE', 'ALCHOLE', 'ACTIVITY', 'CULTURE', 'SPORTS', 'ETC'],
+		categories: ['ALL','STUDY', 'TRAVEL', 'CODING', 'FOOD', 'GAME', 'CAFE', 'ALCHOLE', 'ACTIVITY', 'CULTURE', 'SPORTS', 'ETC'],
 		itemsPerPage: 10,
 		currentPage: 1,
-		 selectedCategory: null,
+		selectedCategory: null,
 
 	}),
 	components: {
 	},
+	watch: {
+		currentPage: {
+			handler: function (newVal, oldVal) {
+				console.log("[watch currentPage]", newVal, oldVal)
+				this.getRoomsFromServer(this.currentPage);
+			},
+			deep: true
+		}
+	},
 	computed: {
 		paginatedRooms() {
-			let rooms = this.getRoomListData || [];
-			const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-			const endIndex = startIndex + this.itemsPerPage;
-			const filteredRooms = this.selectedCategory
-				? rooms.filter((item) => item.category === this.selectedCategory)
-				: rooms;
-			return filteredRooms.slice(startIndex, endIndex);
+			const roomList = this.$store.getters['room/getRoomList'] || [];
+			if (this.selectedCategory && this.selectedCategory !== 'ALL') {
+				return roomList.filter(room => room.category === this.selectedCategory);
+			} else {
+				return roomList;
+			}
 		},
 		totalPages() {
-			let rooms = this.getRoomListData || [];
-			const filteredRoomsLength = this.selectedCategory
-				? rooms.filter((item) => item.category === this.selectedCategory).length
-				: rooms.length;
-			return Math.ceil(filteredRoomsLength / this.itemsPerPage);
+
+			let roomCount = this.$store.getters['room/getCount'];
+			let totalPage = Math.ceil(roomCount / this.itemsPerPage);
+
+			return totalPage
 		},
 
 		getRoomListData() {
@@ -65,31 +73,11 @@ export default {
 
 	},
 	methods: {
-		setCurrentPage(page) {
-			this.currentPage = page;
-		},
 		goToRoomDetail(id) {
 
 			let detailRoom = this.paginatedRooms.find((room) => room.id === id);
-			const setRoom = {
-				id: detailRoom.id,
-				title: detailRoom.title,
-				description: detailRoom.body,
-				img: detailRoom.img,
-				category: 'TRAVEL',
-				location: 'meetupLocation1',
-				meetupStartDate: '2023-06-10T14:20:06.589264',
-				meetupEndDate: '2023-06-11T14:20:06.589281',
-				maxJoinNumber: 10,
-				currentJoinNumber: 1,
-				price: 10000,
-				roomStatus: 'OPEN',
-				roomType: 'ONLINE',
-				viewCount: 31,
-				hostUserId: 1
-			};
 
-			this.$store.dispatch('room/setRoom', setRoom);
+			this.$store.dispatch('room/setRoom', detailRoom);
 			this.$router.push(`/room-detail/${id}`);
 		},
 		filterByCategory(category) {
@@ -97,23 +85,47 @@ export default {
 			this.currentPage = 1;
 		},
 
-		async getRoomList() { 
-			let roomListAxios = (await axios(`http://jsonplaceholder.typicode.com/posts?_limit=33`)).data //array
-			
-			let photos = (await axios("https://picsum.photos/v2/list?limit=33")).data; //array
-			
-			let roomList = roomListAxios.map((room, idx) => 
-				({
-				...room, img: photos[idx].download_url,
-				})
-			)
+		async getRoomsFromServer(page) {
+			console.log("[getRoomFromServer]")
+			try {
 
-			await this.$store.dispatch('room/setRoomList', roomList);
-		}
-	}, 
+				if (!page) {
+					page = 1;
+				}
+
+				const res = (await axios.get(`http://localhost:8080/api/room/list?page=${page}&size=10`))
+				const rooms = res.data;
+
+				console.log({ rooms, page })
+
+				let photos = (await axios("https://picsum.photos/v2/list?limit=33")).data; //array
+				let roomList = rooms.map((room, idx) => {
+					return {
+						...room, img: photos[idx].download_url,
+					}
+				})
+				await this.$store.dispatch('room/setRoomList', roomList);
+
+			} catch (e) {
+				return new Error("getRoomsFromServer error", e);
+			}
+		},
+		async getRoomCount() {
+			try {
+				const response = (await axios.get(`http://localhost:8080/api/room/count`))
+				const roomCount = response.data;
+				console.log({ roomCount })
+
+				await this.$store.dispatch('room/setCount', roomCount);
+
+			} catch (e) {
+				return new Error("getRoomCount error", e);
+			}
+		},
+	},
 	beforeMount() {
-		this.getRoomList();
-		
+		this.getRoomsFromServer();
+
 	}
 };
 </script>
