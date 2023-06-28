@@ -1,6 +1,11 @@
 <template>
+	
 	<v-container>
 		<v-row>
+				<v-btn v-if="isLoggedIn" fab fixed right top color="primary" class="ma-4" @click="goTocreateRoom">
+				    <v-icon>mdi-plus</v-icon>
+				  </v-btn>
+
 			<v-col cols="12">
 				<v-btn v-for="category in categories" :key="category" class="mr-2 mb-2" color="purple-lighten-5"
 					@click="filterByCategory(category)">
@@ -69,15 +74,25 @@ export default {
 
 		getRoomListData() {
 			return this.$store.getters['room/getRoomList'];
+		},
+		isLoggedIn() {
+			return this.$store.getters['auth/isAuthenticated'];
 		}
+
 
 	},
 	methods: {
-		goToRoomDetail(id) {
+		async goToRoomDetail(id) {
 
-			let detailRoom = this.paginatedRooms.find((room) => room.id === id);
+			let roomDetail = (await axios(`http://localhost:8080/api/room/id/${id}`)).data
+			let joinedUserList = (await axios(`http://localhost:8080/api/joinedUser/roomId/${id}`)).data
+			let joinedUserIds = joinedUserList.map((user) => {
+				return user.userId
+			})
 
-			this.$store.dispatch('room/setRoom', detailRoom);
+			await this.$store.dispatch('room/setRoom', roomDetail);
+			await this.$store.dispatch('room/setJoinedUserIds', joinedUserIds);
+
 			this.$router.push(`/room-detail/${id}`);
 		},
 		filterByCategory(category) {
@@ -121,6 +136,9 @@ export default {
 			} catch (e) {
 				return new Error("getRoomCount error", e);
 			}
+		},
+		goTocreateRoom() {
+			this.$router.push('/room-create');
 		},
 	},
 	beforeMount() {

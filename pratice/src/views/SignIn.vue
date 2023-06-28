@@ -61,7 +61,7 @@ export default {
 					description: u.website,
 					accessToken: "fakeToken",
 					profile: imageData[0].url,
-					expiresIn: 100, // 100 seconds
+					expiresIn: 1000, // 100 seconds
 				}			
 			})[0]
 			console.log({user})
@@ -78,7 +78,7 @@ export default {
 
 				fakeUser['profile'] = imageData[0].url
 				fakeUser['userId'] = fakeUser['id']
-				fakeUser['expiresIn'] = expires / 10000 // 10초 이후 로그아웃
+				fakeUser['expiresIn'] = expires // 100초 이후 로그아웃 (/10000 -> 10초, /1000 ->100초)
 
 				await this.$store.dispatch('auth/login', fakeUser);
 
@@ -89,8 +89,11 @@ export default {
 		},
 		async checkFakeUser() { 
 			const user = await this.$store.getters['auth/getUser']
+			const accessToken = this.$store.getters['auth/getAccessToken']
 
-			console.log({user})
+			console.log(user)
+			console.log(accessToken)
+			
 			return user;
 		},
 		async logout() { 

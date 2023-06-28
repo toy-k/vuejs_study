@@ -1,6 +1,6 @@
 <template>
 	<v-container>
-		<h1>Write a New Post</h1>
+		<h1>Edit Post</h1>
 		<v-card>
 			<v-card-text>
 				<v-form ref="form" @submit.prevent="submitForm" @validate="isValidateForm">
@@ -19,13 +19,12 @@
 
 					<v-row>
 						<v-col cols="6">
-							<v-text-field type="datetime-local" label="모임 시작 시간" v-model="postData.meetupStartDate"
+							<v-text-field type="datetime-local" label="Meetup Start Time" v-model="postData.meetupStartDate"
 								:rules="[meetupStartDateRule]"></v-text-field>
 						</v-col>
 						<v-col cols="6">
-							<v-text-field type="datetime-local" label="모임 끝 시간" v-model="postData.meetupEndDate"
+							<v-text-field type="datetime-local" label="Meetup End Time" v-model="postData.meetupEndDate"
 								:rules="[meetupEndDateRule]"></v-text-field>
-
 						</v-col>
 					</v-row>
 
@@ -39,17 +38,15 @@
 						</v-col>
 					</v-row>
 
-
 					<v-row>
 						<v-col cols="6">
-							<v-file-input v-model="postData.file" label="Meetup file"></v-file-input>
+							<v-file-input v-model="postData.file" label="Meetup File"></v-file-input>
 						</v-col>
 						<v-col cols="6">
-							<v-file-input v-model="postData.file" label="Meetup Photo" accept="image/*"></v-file-input>
-
+							<v-file-input v-model="postData.photoFile" label="Meetup Photo" accept="image/*"></v-file-input>
 						</v-col>
 					</v-row>
-					<v-btn color="primary" type="submit">Submit</v-btn>
+					<v-btn color="primary" type="submit">Update</v-btn>
 				</v-form>
 			</v-card-text>
 		</v-card>
@@ -57,12 +54,13 @@
 </template>
 
 <script>
-
 import axios from 'axios';
 import { mapState } from 'vuex';
+
 export default {
 	data() {
 		return {
+			roomId:'',
 			postData: {
 				title: '',
 				description: '',
@@ -73,17 +71,17 @@ export default {
 				maxJoinNumber: null,
 				price: null,
 				roomType: '',
-				file: null, // Added file property for file upload
-				photoFile: null, // Added file property for file upload
+				file: null,
+				photoFile: null,
 			},
 			categoryOptions: [
 				'STUDY', 'TRAVEL', 'CODING', 'FOOD', 'GAME', 'CAFE',
 				'ALCOHOL', 'ACTIVITY', 'CULTURE', 'SPORTS', 'ETC'
 			],
 			roomTypeOptions: ['ONLINE', 'OFFLINE'],
-			roomStatusOptions: ['OPEN', 'CLOSED'],
 		};
-	}, computed: {
+	},
+	computed: {
 		...mapState('auth', ['user']),
 
 		rules() {
@@ -91,9 +89,8 @@ export default {
 				if (value === null || value === undefined || value === '') {
 					return 'You must enter a value';
 				}
-
-				return true
-			}
+				return true;
+			};
 		},
 		positiveRule() {
 			return value => {
@@ -105,7 +102,7 @@ export default {
 					return 'You must enter a positive number';
 				}
 				return true;
-			}
+			};
 		},
 		meetupStartDateRule() {
 			return value => {
@@ -144,76 +141,88 @@ export default {
 			deep: true
 		}
 	},
+	created() {
+		let room = this.$store.getters['room/getRoom'];
+		this.roomId = room.id;
+		console.log(this.roomId)
+
+		this.getRoomFromServer();
+	},
 	methods: {
 		isValidateForm() {
-			return this.$refs.form.validate()
+			return this.$refs.form.validate();
+		},
+		async getRoomFromServer() {
+			try {
+				console.log(this.roomId);
+				const response = await axios.get(`http://localhost:8080/api/room/id/${this.roomId}`);
+				const roomData = response.data;
+				this.postData = { ...roomData }; 
+			} catch (error) {
+				console.log('Error fetching room data:', error);
+			}
 		},
 		async submitForm() {
-			console.log(await this.isValidateForm())
+			console.log(await this.isValidateForm());
 			if ((await this.isValidateForm()).valid == false) {
 				console.error("Validation Error");
 				return;
 			}
 
-
 			try {
-
 				let user = this.$store.getters['auth/getUser'];
-				let accessToken = user.accessToken;
+				let accessToken = this.$store.getters['auth/getAccessToken'];
 
-				// console.log({ accessToken, user })
+				console.log({ accessToken, user })
+				console.log(user.id)
 
 				const headers = {
 					Authorization: `Bearer ${accessToken}`,
 				};
+
 				const data = {
-					"title": this.postData.title,
-					"description": this.postData.description,
-					"category": this.postData.category,
-					"location": this.postData.location,
-					"meetupStartDate": this.postData.meetupStartDate,
-					"meetupEndDate": this.postData.meetupEndDate,
-					"maxJoinNumber": this.postData.maxJoinNumber,
-					"price": this.postData.price,
+					id: this.roomId,
+					title: this.postData.title,
+					description: this.postData.description,
+					category: this.postData.category,
+					location: this.postData.location,
+					meetupStartDate: this.postData.meetupStartDate,
+					meetupEndDate: this.postData.meetupEndDate,
+					maxJoinNumber: this.postData.maxJoinNumber,
+					price: this.postData.price,
 					"roomStatus": "OPEN",
-					"roomType": this.postData.roomType,
+					roomType: this.postData.roomType,
 					"hostUserId": user.id
-				}
+				};
 
+				const updatedPost = await axios({
+					method: 'put',
+					url: `http://localhost:8080/api/room`, // Replace 'roomId' with the actual ID of the room to be updated
+					data: data,
+					headers: headers
+				});
 
-				const createdPost = await axios(
-					{
-						method: 'post',
-						url: 'http://localhost:8080/api/room',
-						data: data,
-						headers: headers
-					}
-					)
-			const createdRoom = createdPost.data;
-			await this.$store.dispatch('room/setCreatedRoom', createdRoom);
-			// console.log({ createdRoom })
-			this.$router.push('/room-list');
-
-		} catch(e) {
-			console.log("API POST ERROR: ", e);
-		}
+				const updatedRoom = updatedPost.data;
+				await this.$store.dispatch('room/setCreatedRoom', updatedRoom);
+				this.$router.push('/room-list');
+			} catch (e) {
+				console.log("API PUT ERROR:", e);
+			}
 
 			this.postData = {
-			title: '',
-			description: '',
-			category: '',
-			location: '',
-			meetupStartDate: null,
-			meetupEndDate: null,
-			maxJoinNumber: null,
-			price: null,
-			roomType: '',
-			file: null,
-			photoFile: null,
-		};
-
+				title: '',
+				description: '',
+				category: '',
+				location: '',
+				meetupStartDate: null,
+				meetupEndDate: null,
+				maxJoinNumber: null,
+				price: null,
+				roomType: '',
+				file: null,
+				photoFile: null,
+			};
+		}
 	}
-},
 };
 </script>
-

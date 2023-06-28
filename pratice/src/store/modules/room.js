@@ -6,6 +6,7 @@ const roomModule = {
 			roomList: [],
 			createdRoom: null,
 			count: 0,
+			joinedUserIds:[]
 		}
 	},
 	mutations: {
@@ -20,6 +21,9 @@ const roomModule = {
 		},
 		setCount(state, payload) {
 			state.count = payload;
+		},
+		setJoinedUserIds(state, payload) {
+			state.joinedUserIds = payload;
 		}
 	},
 	actions: {
@@ -34,6 +38,9 @@ const roomModule = {
 		},
 		setCount(context, payload) {
 			context.commit('setCount', payload);
+		},
+		setJoinedUserIds(context, payload) {
+			context.commit('setJoinedUserIds', payload);
 		}
 	},
 	getters: {
@@ -41,6 +48,7 @@ const roomModule = {
 		getRoomList(state) { return state.roomList; },
 		getCreatedRoom(state) { return state.createdRoom; },
 		getCount(state) { return state.count; },
+		getJoinedUserIds(state) { return state.joinedUserIds; }
 	}
 }
 

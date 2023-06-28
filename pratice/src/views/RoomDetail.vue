@@ -2,11 +2,11 @@
 	<v-container>
 		<v-card>
 			<v-card-actions>
-				<v-btn color="teal-lighten-1" @click="joinRoom">Join</v-btn>
-				<v-btn color="primary" @click="leaveRoom">Leave</v-btn>
+				<v-btn v-if="isJoined" color="teal-lighten-1" @click="joinRoom">Join</v-btn>
+				<v-btn v-if="isPossibleToLeave" color="primary" @click="leaveRoom">Leave</v-btn>
 				<v-spacer />
-				<v-btn color="indigo-lighten-1" @click="editRoom">Edit</v-btn>
-				<v-btn color="red-darken-1" @click="deleteRoom">Delete</v-btn>
+				<v-btn v-if="isHost" color="indigo-lighten-1" @click="editRoom">Edit</v-btn>
+				<v-btn v-if="isHost" color="red-darken-1" @click="deleteRoom">Delete</v-btn>
 			</v-card-actions>
 		</v-card>
 
@@ -16,11 +16,11 @@
 					<v-img :src="getRoom().img" :alt="getRoom().title" height="300"></v-img>
 				</v-col>
 				<v-card-text class="font-weight-bold">참여 중인 유저</v-card-text>
-					<v-col cols="6" sm="4">
-						<v-img v-for="(image, index) in getRoom().participants" :key="index" :src="image"
-							:alt="`Participant ${index + 1}`" height="50" class="mr-2 mb-2"></v-img>
-					</v-col>
-				</v-row>
+				<v-col cols="6" sm="4">
+					<v-img v-for="(image, index) in getRoom().participants" :key="index" :src="image"
+						:alt="`Participant ${index + 1}`" height="50" class="mr-2 mb-2"></v-img>
+				</v-col>
+			</v-row>
 
 
 			<v-card-title>{{ getRoom().title }}</v-card-title>
@@ -97,6 +97,55 @@ export default {
 	mounted() {
 		this.getRoom();
 		this.getCommentListApi();
+	}, computed: {
+		isHost() {
+			let room = this.$store.getters['room/getRoom'];
+			let user = this.$store.getters['auth/getUser'];
+
+			if (!room || !user || (room.hostUserId !== user.id)) {
+				// console.log("false")
+				return false;
+			} else {
+				// console.log("true")
+				return true;
+			}
+		},
+		isJoined() {
+			let room = this.$store.getters['room/getRoom'];
+			let user = this.$store.getters['auth/getUser'];
+			let joinedUserIds = this.$store.getters['room/getJoinedUserIds'];
+
+			if (!room || !user || !joinedUserIds
+				|| (room.hostUserId === user.id)
+				|| (joinedUserIds.includes(user.id))
+				|| (room.currentJoinNumber >= room.maxJoinNumber)
+			) {
+
+				console.log("false")
+				return false;
+			} else {
+				console.log("true")
+				return true;
+			}
+		},
+		isPossibleToLeave() {
+			let room = this.$store.getters['room/getRoom'];
+			let user = this.$store.getters['auth/getUser'];
+			let joinedUserIds = this.$store.getters['room/getJoinedUserIds'];
+
+			if (!room || !user || !joinedUserIds
+				|| (room.hostUserId === user.id)
+				|| (!joinedUserIds.includes(user.id))
+			) {
+
+				console.log("false")
+				return false;
+			} else {
+				console.log("true")
+				return true;
+			}
+
+		}
 	},
 	methods: {
 		formatDate(dateString) {
@@ -129,10 +178,98 @@ export default {
 				console.error("error axios commentList = ", e);
 			}
 		},
-		editRoom() { return "editRoom" },
-		deleteRoom() { return "deleteRoom" },
-		joinRoom() { return "joinRoom" },
-		leaveRoom() { return "leaveRoom" },
+		async joinRoom() {
+			let room = this.$store.getters['room/getRoom'];
+			let user = this.$store.getters['auth/getUser'];
+			let joinedUserIds = this.$store.getters['room/getJoinedUserIds'];
+
+			if (!room || !user || !joinedUserIds
+				|| (room.hostUserId === user.id)
+				|| (joinedUserIds.includes(user.id))) {
+
+				console.error("joinRoom error")
+
+				return null;
+			}
+
+			console.log(user)
+			console.log(user.accessToken)
+
+			
+			await axios({
+				method: 'post',
+				url: 'http://localhost:8080/api/joinedUser',
+				data: {
+					roomId: room.id,
+					userId: user.id
+				},
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			})
+
+			await this.$store.dispatch('room/setJoinedUserIds', [...joinedUserIds, user.id])
+			this.$router.push('/room-list');
+
+		},
+		async leaveRoom() {
+			let room = this.$store.getters['room/getRoom'];
+			let user = this.$store.getters['auth/getUser'];
+			let joinedUserIds = this.$store.getters['room/getJoinedUserIds'];
+
+			if (!room || !user || !joinedUserIds
+				|| (room.hostUserId === user.id)
+				|| (!joinedUserIds.includes(user.id))) {
+
+				console.error("joinRoom error")
+
+				return null;
+			}
+
+			await axios({
+				method: 'delete',
+				url: 'http://localhost:8080/api/joinedUser',
+				data: {
+					roomId: room.id,
+					userId: user.id
+				},
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`
+				}
+			})
+
+			joinedUserIds = joinedUserIds.filter((id) => id !== user.id)
+
+			await this.$store.dispatch('room/setJoinedUserIds', joinedUserIds)
+			this.$router.push('/room-list');
+		},
+		editRoom() {
+			this.$router.push(`/room-update/${this.getRoom().id}`);
+		},
+		async deleteRoom() {
+			let room = this.$store.getters['room/getRoom'];
+			let accessToken = this.$store.getters['auth/getAccessToken'];
+
+			console.log({ accessToken, room })
+
+			const headers = {
+				Authorization: `Bearer ${accessToken}`,
+			};
+			const data = {
+				id: room.id,
+			}
+
+			await axios({
+				method: 'delete',
+				url: `http://localhost:8080/api/room`,
+				headers: headers,
+				data: data
+			})
+
+			this.$router.push('/room-list');
+
+
+		},
 
 	}
 };

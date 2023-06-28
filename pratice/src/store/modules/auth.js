@@ -12,7 +12,7 @@ const authModule = {
 	},
 	mutations: {
 		setUser(state, payload) {
-			console.log("[setUser] ", payload);
+			// console.log("[setUser] ", payload);
 			state.userId = payload.userId;
 			state.accessToken = payload.accessToken;
 			state.didAutoLogout = false;
@@ -24,7 +24,7 @@ const authModule = {
 	},
 	actions: {
 		async login(context, payload) { 
-			console.log("[login] ", payload)
+			// console.log("[login] ", payload)
 			return context.dispatch('auth', {
 				...payload,
 				mode: 'login'
@@ -39,6 +39,7 @@ const authModule = {
 			localStorage.setItem('accessToken', userData.accessToken);
 			localStorage.setItem('userId', userData.userId);
 			localStorage.setItem('accessTokenExpiration', expirationDate);
+			localStorage.setItem('user', JSON.stringify(userData));
 
 			timer = setTimeout(function () {
 				context.dispatch('autoLogout');
@@ -56,9 +57,9 @@ const authModule = {
 			const accessToken = localStorage.getItem('accessToken');
 			const userId = localStorage.getItem('userId');
 			const accessTokenExpiration = localStorage.getItem('accessTokenExpiration');
+			const user = JSON.parse(localStorage.getItem('user'));
 
 			const expiresIn = +accessTokenExpiration - new Date().getTime();
-
 			if (expiresIn < 0) {
 				return;
 			}
@@ -70,7 +71,8 @@ const authModule = {
 			if(accessToken && userId) {
 				context.commit('setUser', {
 					userId: userId,
-					accessToken: accessToken
+					accessToken: accessToken,
+					user:user
 				});
 			}
 		},
@@ -83,7 +85,8 @@ const authModule = {
 
 			context.commit('setUser', {
 				userId: null,
-				accessToken: null
+				accessToken: null,
+				user: null,
 			});
 		},
 		autoLogout(context) {
@@ -94,7 +97,7 @@ const authModule = {
 	},
 	getters: {
 		getUserId(state) { return state.userId; },
-		getaccessToken(state) { return state.accessToken; },
+		getAccessToken(state) { return state.accessToken; },
 		getDidAutoLogout(state) { return state.didAutoLogout; },
 		isAuthenticated(state) { return !!state.accessToken; },
 		getUser(state) { return state.user; },

@@ -1,23 +1,32 @@
 <template>
 	<v-container>
 		<h1>My Profile</h1>
-		<v-card>
-			<v-row>
+	
+			<v-card color="">
+				<v-row>
+						<v-col cols="10">
+						</v-col>
+						<v-col cols="2">
+									<v-btn color="indigo-lighten-4" @click="editUser">edit</v-btn>
+						</v-col>
+					</v-row>
+
+				<v-row>
+					<v-col cols="1">
+					</v-col>	
 				<v-col cols="4">
-					<v-avatar size="150">
-						<v-img v-if="userData.profile" :src="userData.profile" :alt="userData.username"></v-img>
+					<v-avatar size="270">
+						<v-img v-if="getUserFromServer().profile" :src="getUserFromServer().profile" :alt="getUserFromServer().username"></v-img>
 						<v-icon v-else>mdi-account-circle</v-icon>
 					</v-avatar>
 				</v-col>
-				<v-col cols="8">
+				<v-col cols="6">
 					<v-card-text>
 						<v-row>
-							<v-col cols="6">
-								<v-text-field v-model="userData.username" label="Username" readonly></v-text-field>
-								<v-text-field v-model="userData.email" label="Email" readonly></v-text-field>
-							</v-col>
-							<v-col cols="6">
-								<v-textarea v-model="userData.description" label="Description" readonly></v-textarea>
+							<v-col cols="12">
+								<v-text-field v-model="getUserFromServer().username" label="Username" readonly></v-text-field>
+								<v-text-field v-model="getUserFromServer().email" label="Email" readonly></v-text-field>
+								<v-textarea v-model="getUserFromServer().description" label="Description" readonly></v-textarea>
 							</v-col>
 						</v-row>
 					</v-card-text>
@@ -28,37 +37,25 @@
 </template>
 
 <script>
+
+
 export default {
 	name: 'MyDetail',
 	data() {
 		return {
-			userData: {
-				id: null,
-				username: '',
-				profile: null,
-				email: '',
-				description: ''
-			}
 		};
 	},
 	mounted() {
-		this.getUserData();
 	},
 	methods: {
-		getUserData() {
-			// Simulate GET request to retrieve user data
-			// Replace this with your actual API call
-			setTimeout(() => {
-				const responseData = {
-					id: 1,
-					username: 'fakeuser1',
-					profile: 'https://example.com/profile-image.jpg',
-					email: 'jeonghwanlee11@gmail.com',
-					description: 'fakeuser1description'
-				};
-				this.userData = responseData;
-			}, 1000);
-		}
+		getUserFromServer() {
+			let user = this.$store.getters['auth/getUser'];
+			return user
+		},
+		editUser() { 
+			this.$router.push({ name: 'UpdateMyDetail' });
+		},
+		
 	}
 };
 </script>
