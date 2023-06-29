@@ -89,6 +89,16 @@ export default {
 			let joinedUserIds = joinedUserList.map((user) => {
 				return user.userId
 			})
+			let uploadFile;
+			
+			try {
+				uploadFile = (await axios(`http://localhost:8080/api/upload/roomId/${id}`)).data
+
+			} catch (e) {
+				uploadFile = '';
+			  }
+			
+			roomDetail['uploadFile'] = uploadFile.fileName
 
 			await this.$store.dispatch('room/setRoom', roomDetail);
 			await this.$store.dispatch('room/setJoinedUserIds', joinedUserIds);

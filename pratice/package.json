@@ -13,6 +13,7 @@
     "axios": "^1.4.0",
     "core-js": "^3.8.3",
     "dayjs": "^1.11.8",
+    "js-file-download": "^0.4.12",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",

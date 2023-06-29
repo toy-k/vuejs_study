@@ -72,8 +72,19 @@
 				</v-col>
 			</v-row>
 			<v-divider class="my-4"></v-divider>
-			<v-card-text class="font-weight-bold">Host User ID</v-card-text>
-			<v-card-text>{{ getRoom().hostUserId }}</v-card-text>
+
+				<v-row>
+					<v-col cols="6" sm="4">
+						<v-card-text class="font-weight-bold">Host User ID</v-card-text>
+						<v-card-text>{{ getRoom().hostUserId }}</v-card-text>
+					</v-col>
+					<v-col cols="6" sm="4">
+						<v-card-text class="font-weight-bold">upload file</v-card-text>
+							<v-card-text @click="downloadFile">{{ getRoom().uploadFile }}</v-card-text>
+					</v-col>
+					<v-col cols="6" sm="4">
+					</v-col>
+				</v-row>
 		</v-card>
 
 		<v-spacer></v-spacer>
@@ -270,6 +281,11 @@ export default {
 
 
 		},
+		async downloadFile() { 
+			let room = this.$store.getters['room/getRoom'];
+			window.location.href = `http://localhost:8080/api/upload/download/roomId/${room.id}?files=${room.uploadFile}`;
+
+		}
 
 	}
 };

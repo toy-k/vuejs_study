@@ -12,7 +12,7 @@ const authModule = {
 	},
 	mutations: {
 		setUser(state, payload) {
-			// console.log("[setUser] ", payload);
+			console.log("[setUser] ", payload);
 			state.userId = payload.userId;
 			state.accessToken = payload.accessToken;
 			state.didAutoLogout = false;
@@ -92,6 +92,17 @@ const authModule = {
 		autoLogout(context) {
 			context.dispatch('logout');
 			context.commit('setAutoLogout');
+		},
+		updateUser(context, payload) {
+			context.commit('setUser',
+				{
+					userId: payload.userId,
+					accessToken: payload.accessToken,
+					user: payload.user
+				}
+			)
+			localStorage.setItem('user', JSON.stringify(payload.user));
+
 		}
 		
 	},

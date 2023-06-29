@@ -42,10 +42,10 @@
 
 					<v-row>
 						<v-col cols="6">
-							<v-file-input v-model="postData.file" label="Meetup file"></v-file-input>
+							<v-file-input label="Meetup file" @change="onFileChange"></v-file-input>
 						</v-col>
 						<v-col cols="6">
-							<v-file-input v-model="postData.file" label="Meetup Photo" accept="image/*"></v-file-input>
+							<v-file-input  label="Meetup Photo" accept="image/*"></v-file-input>
 
 						</v-col>
 					</v-row>
@@ -155,7 +155,6 @@ export default {
 				return;
 			}
 
-
 			try {
 
 				let user = this.$store.getters['auth/getUser'];
@@ -191,7 +190,11 @@ export default {
 					)
 			const createdRoom = createdPost.data;
 			await this.$store.dispatch('room/setCreatedRoom', createdRoom);
-			// console.log({ createdRoom })
+				console.log({ createdRoom })
+			if (this.postData.file) {
+				await this.uploadFile();
+			}
+
 			this.$router.push('/room-list');
 
 		} catch(e) {
@@ -212,8 +215,40 @@ export default {
 			photoFile: null,
 		};
 
-	}
-},
+		},
+		onFileChange(event) { 
+			this.postData.file = event.target.files[0];
+		},
+		async uploadFile() { 
+			let accessToken = this.$store.getters['auth/getAccessToken'];
+			let room = await this.$store.getters['room/getCreatedRoom'];
+
+			console.log({room})
+
+			const formData = new FormData();
+			formData.append('files', this.postData.file);
+			formData.append('roomId', room.id)
+
+			const headers = {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'multipart/form-data',
+			};
+
+			try {
+				let res = (await axios({
+					method: 'post',
+					url: `http://localhost:8080/api/upload`,
+					data: formData,
+					headers: headers,
+				})).data
+				console.log({ res })
+
+			} catch (e) {
+				console.error(e);
+			}
+
+		},
+	},
 };
 </script>
 

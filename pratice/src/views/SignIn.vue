@@ -75,8 +75,11 @@ export default {
 				const expires = response.headers.expires;
 
 				let imageData = (await axios.get(`https://jsonplaceholder.typicode.com/photos?id=${userId}`)).data
-
-				fakeUser['profile'] = imageData[0].url
+				if (fakeUser.profile == null) {
+					fakeUser['profile'] = imageData[0].url
+				} else { 
+					fakeUser['profile'] = `data:image/jpeg;base64,${fakeUser.profile}`
+				}
 				fakeUser['userId'] = fakeUser['id']
 				fakeUser['expiresIn'] = expires // 100초 이후 로그아웃 (/10000 -> 10초, /1000 ->100초)
 

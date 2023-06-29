@@ -7,6 +7,7 @@
 				<v-col cols="10"></v-col>
 				<v-col cols="2">
 					<v-btn color="indigo-lighten-4" @click="editUser">Save</v-btn>
+						<v-btn color="red-lighten-4" @click="onCancle">Cancle</v-btn>
 				</v-col>
 			</v-row>
 
@@ -14,7 +15,7 @@
 				<v-col cols="1"></v-col>
 				<v-col cols="4">
 					<v-avatar size="190">
-						<v-img v-if="profileImage" :src="profileImage" :alt="getUserFromServer().username"></v-img>
+						<v-img v-if="editedUser.profile" :src="editedUser.profile" :alt="editedUser.username"></v-img>
 						<v-icon v-else>mdi-account-circle</v-icon>
 					</v-avatar>
 					<v-file-input label="Upload Image" accept="image/*" @change="onProfileImageChange"></v-file-input>
@@ -46,8 +47,9 @@ export default {
 			  editedUser: {
 				username: '',
 				description: '',
+				profile:''
 			},
-			profileImage: null,
+			newProfileImage: null,
 		};
 	}, computed: {
 				rules() {
@@ -66,13 +68,14 @@ export default {
 			let user = this.$store.getters['auth/getUser'];
 			this.editedUser.username = user.username;
 			this.editedUser.description = user.description;
-			// return user;
+			this.editedUser.profile = user.profile;
 		},
 		async editUser() {
 			let user = this.$store.getters['auth/getUser'];
+			let accessToken = this.$store.getters['auth/getAccessToken'];
 
-			if (this.profileImage) { 
-				this.updateProfileImage();
+			if (this.newProfileImage) { 
+				await this.updateProfileImage();
 			}
 
 			const headers = {
@@ -81,19 +84,35 @@ export default {
 
 			const data = {
 				id: user.id,
-				username: this.postData.username,
-				description: this.postData.description,
+				username: this.editedUser.username,
+				description: this.editedUser.description,
 			};
 
-
 			try {
-				let res = (await axios({
+				let imageRes = (await axios({
 					method: 'put',
 					url: `http://localhost:8080/api/user/me`,
 					data: data,
 					headers: headers,
 				})).data
-				console.log({res})
+
+				let userRes = (await axios({
+					method: 'get',
+					url: `http://localhost:8080/api/user/me`,
+					headers: headers,
+				})).data
+
+				userRes['profile'] = `data:image/jpeg;base64,${imageRes['profile']}`
+
+				let newUser = {
+					userId: user.id,
+					accessToken: accessToken,
+					user : userRes
+				}
+
+				await this.$store.dispatch('auth/updateUser', newUser);
+
+				this.$router.push({ name: 'MyDetail' });
 				
 			} catch (e) { 
 				console.error(e);
@@ -101,19 +120,14 @@ export default {
 
 		},
 		async updateProfileImage() { 
+			let accessToken = this.$store.getters['auth/getAccessToken'];
+
 			const formData = new FormData();
-			formData.append('file', this.profileImage);
+			formData.append('file', this.newProfileImage);
 
 				const headers = {
 				Authorization: `Bearer ${accessToken}`,
 			};
-
-			const data = {
-				id: user.id,
-				username: this.postData.username,
-				description: this.postData.description,
-			};
-
 
 			try {
 				let res = (await axios({
@@ -130,8 +144,11 @@ export default {
 
 		},
 		onProfileImageChange(event) {
-			this.profileImage = event.target.files[0];
-		 }
+			this.newProfileImage = event.target.files[0];
+		},
+		onCancle() { 
+							this.$router.push({ name: 'MyDetail' });
+		}
 	},
 };
 </script>
