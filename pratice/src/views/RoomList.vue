@@ -175,8 +175,10 @@ export default {
 			try {
 				const response = (await axios.get(`http://localhost:8080/fakeuser/all`))
 				let users = response.data;
-				users.map((user) => { 
-					user['profile'] = user['profile'] ? `data:image/jpeg;base64,${user.profile}` : ''
+
+				users.map(async (user) => { 
+					let imageData = (await axios.get(`https://jsonplaceholder.typicode.com/photos?id=${user.id}`)).data
+					user['profile'] = user['profile'] ? `data:image/jpeg;base64,${user.profile}` : imageData[0].url
 				})
 				console.log({ users })
 
@@ -185,7 +187,8 @@ export default {
 			} catch (e) {
 				return new Error("getUsersFromServer error", e);
 			}
-		}
+		},
+		
 	},
 	beforeMount() {
 		this.getRoomsFromServer();

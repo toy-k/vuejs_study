@@ -12,17 +12,11 @@
 
 		<v-card>
 			<v-row>
-				<v-col cols="6" sm="8">
+				<v-col cols="12">
 					<v-img :src="getRoom().img" :alt="getRoom().title" height="300" width="100%"></v-img>
 				</v-col>
-				<v-card-text class="font-weight-bold">참여 중인 유저</v-card-text>
-				<v-col cols="6" sm="4">
-					<v-avatar size="50">
-
-					<v-img v-for="(user, index) in getJoinedUserList()" :key="index" :src="user.profile" :alt="`Participant ${index}`" class="mr-2 mb-2"></v-img>
-					</v-avatar>
-	
-					</v-col>
+				<v-col cols="12">
+				</v-col>
 			</v-row>
 
 
@@ -30,6 +24,23 @@
 			<v-card-subtitle class="mb-4">Category: {{ getRoom().category }}</v-card-subtitle>
 			<v-card-text>{{ getRoom().description }}</v-card-text>
 			<v-divider class="my-4"></v-divider>
+			<v-card-text class="font-weight-bold">참여 중인 유저</v-card-text>
+
+			<div>
+				<v-avatar class="avatar-container" v-for="(user, index) in getJoinedUserList()" :key="index" size="80" @mouseover="showInfo" @mouseleave="hideInfo">
+					<v-img :src="user.profile"
+						:alt="`Participant ${index}`" >
+						<div class="avatar-info" v-show="isShow">
+							{{ user.username }}
+						</div>
+						</v-img>				
+				</v-avatar>
+
+			</div>
+
+			
+			<v-divider class="my-4"></v-divider>
+
 			<v-row>
 				<v-col cols="6" sm="4">
 					<v-card-text class="font-weight-bold">Location</v-card-text>
@@ -76,18 +87,18 @@
 			</v-row>
 			<v-divider class="my-4"></v-divider>
 
-				<v-row>
-					<v-col cols="6" sm="4">
-						<v-card-text class="font-weight-bold">Host User ID</v-card-text>
-						<v-card-text>{{ getRoom().hostUserId }}</v-card-text>
-					</v-col>
-					<v-col cols="6" sm="4">
-						<v-card-text class="font-weight-bold">upload file</v-card-text>
-							<v-card-text @click="downloadFile">{{ getRoom().uploadFile }}</v-card-text>
-					</v-col>
-					<v-col cols="6" sm="4">
-					</v-col>
-				</v-row>
+			<v-row>
+				<v-col cols="6" sm="4">
+					<v-card-text class="font-weight-bold">Host User ID</v-card-text>
+					<v-card-text>{{ getRoom().hostUserId }}</v-card-text>
+				</v-col>
+				<v-col cols="6" sm="4">
+					<v-card-text class="font-weight-bold">upload file</v-card-text>
+					<v-card-text @click="downloadFile">{{ getRoom().uploadFile }}</v-card-text>
+				</v-col>
+				<v-col cols="6" sm="4">
+				</v-col>
+			</v-row>
 		</v-card>
 
 		<v-spacer></v-spacer>
@@ -103,6 +114,7 @@ export default {
 	name: 'RoomDetail',
 	data() {
 		return {
+			isShow: false,
 		};
 	},
 	components: {
@@ -209,7 +221,7 @@ export default {
 			console.log(user)
 			console.log(user.accessToken)
 
-			
+
 			await axios({
 				method: 'post',
 				url: 'http://localhost:8080/api/joinedUser',
@@ -284,12 +296,12 @@ export default {
 
 
 		},
-		async downloadFile() { 
+		async downloadFile() {
 			let room = this.$store.getters['room/getRoom'];
 			window.location.href = `http://localhost:8080/api/upload/download/roomId/${room.id}?files=${room.uploadFile}`;
 
 		},
-		getJoinedUserList() { 
+		getJoinedUserList() {
 			let room = this.$store.getters['room/getRoom'];
 			let joinedUserIds = this.$store.getters['room/getJoinedUserIds'];
 			let userList = this.$store.getters['user/getUserList'];
@@ -302,11 +314,24 @@ export default {
 			for (let i = 0; i < userList.length; i++) {
 				if (joinedUserIds.includes(userList[i].id)) {
 					joinedUserList.push(userList[i])
-					
+
 				}
 			}
-		
-			return userList
+			console.log({ joinedUserList })
+			return joinedUserList
+		},
+		showUsernamePopup(username, on) {
+			on.show();
+
+			// Delay hiding the tooltip after a certain time (e.g., 2 seconds)
+			setTimeout(() => {
+				on.hide();
+			}, 2000);
+		},
+		showInfo() { 
+			this.isShow = true;
+		}, hideInfo() { 
+			this.isShow = false;
 		}
 
 	}
@@ -325,5 +350,23 @@ export default {
 
 .font-weight-bold {
 	font-weight: bold;
+}
+
+.avatar-info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.avatar-container {
+  margin-right: 10px; /* 원하는 간격 크기로 조정 */
+	margin-left: 10px;
 }
 </style>
