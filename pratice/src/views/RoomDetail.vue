@@ -13,13 +13,16 @@
 		<v-card>
 			<v-row>
 				<v-col cols="6" sm="8">
-					<v-img :src="getRoom().img" :alt="getRoom().title" height="300"></v-img>
+					<v-img :src="getRoom().img" :alt="getRoom().title" height="300" width="100%"></v-img>
 				</v-col>
 				<v-card-text class="font-weight-bold">참여 중인 유저</v-card-text>
 				<v-col cols="6" sm="4">
-					<v-img v-for="(image, index) in getRoom().participants" :key="index" :src="image"
-						:alt="`Participant ${index + 1}`" height="50" class="mr-2 mb-2"></v-img>
-				</v-col>
+					<v-avatar size="50">
+
+					<v-img v-for="(user, index) in getJoinedUserList()" :key="index" :src="user.profile" :alt="`Participant ${index}`" class="mr-2 mb-2"></v-img>
+					</v-avatar>
+	
+					</v-col>
 			</v-row>
 
 
@@ -88,12 +91,12 @@
 		</v-card>
 
 		<v-spacer></v-spacer>
-		<Comment />
+		<Review />
 	</v-container>
 </template>
 
 <script>
-import Comment from '@/views/Comment.vue';
+import Review from '@/views/Review.vue';
 import axios from 'axios';
 
 export default {
@@ -103,11 +106,11 @@ export default {
 		};
 	},
 	components: {
-		Comment
+		Review
 	},
 	mounted() {
-		this.getRoom();
-		this.getCommentListApi();
+		// this.getRoom();
+		// this.getReviewListApi();
 	}, computed: {
 		isHost() {
 			let room = this.$store.getters['room/getRoom'];
@@ -169,24 +172,24 @@ export default {
 			return this.$store.getters['room/getRoom'];
 
 		},
-		async getCommentListApi() {
+		async getReviewListApi() {
 			try {
 				const roomId = this.$route.params.id;
-				let commentAxios = (await axios(`https://jsonplaceholder.typicode.com/comments?postId=` + roomId)).data
-				// console.log({ commentAxios })
-				const commentList = commentAxios.map((comment, idx) =>
+				let reviewAxios = (await axios(`https://jsonplaceholder.typicode.com/comments?postId=` + roomId)).data
+				// console.log({ reviewAxios })
+				const reviewList = reviewAxios.map((review, idx) =>
 				({
-					id: comment.id,
-					content: comment.body,
-					rating: comment.id,
-					name: comment.email
+					id: review.id,
+					content: review.body,
+					rating: review.id,
+					name: review.email
 				})
 				)
-				// console.log({ commentList })
-				await this.$store.dispatch('comment/setCommentList', commentList)
+				// console.log({ reviewList })
+				await this.$store.dispatch('review/setReviewList', reviewList)
 
 			} catch (e) {
-				console.error("error axios commentList = ", e);
+				console.error("error axios reviewList = ", e);
 			}
 		},
 		async joinRoom() {
@@ -285,6 +288,25 @@ export default {
 			let room = this.$store.getters['room/getRoom'];
 			window.location.href = `http://localhost:8080/api/upload/download/roomId/${room.id}?files=${room.uploadFile}`;
 
+		},
+		getJoinedUserList() { 
+			let room = this.$store.getters['room/getRoom'];
+			let joinedUserIds = this.$store.getters['room/getJoinedUserIds'];
+			let userList = this.$store.getters['user/getUserList'];
+			let joinedUserList = [];
+			if (!room || !joinedUserIds || !userList) {
+				return null;
+			}
+
+			//유저들 중 방에 참여중인 유저 정보를 joinedUserList에 넣는다.
+			for (let i = 0; i < userList.length; i++) {
+				if (joinedUserIds.includes(userList[i].id)) {
+					joinedUserList.push(userList[i])
+					
+				}
+			}
+		
+			return userList
 		}
 
 	}

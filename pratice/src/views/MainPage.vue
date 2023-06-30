@@ -11,7 +11,7 @@
 
 <script>
 
-//import axios from 'axios';
+import axios from 'axios';
 
 import BlogCard from './dashboard/dashboardComponents/blog-card/BlogCard.vue'
 	export default {
@@ -23,9 +23,10 @@ import BlogCard from './dashboard/dashboardComponents/blog-card/BlogCard.vue'
 			BlogCard
 	},
 	created() {
+		
 	},
 	methods: {
-
+	
 	}
 }
 </script>

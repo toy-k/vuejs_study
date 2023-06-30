@@ -80,9 +80,9 @@ export default ({
 		}
 	},
 	methods: {
-		logout() { 
-			this.$store.dispatch('auth/logout');
-			this.$router.replace('/main-page');
+		async logout() { 
+			await this.$router.replace('/main-page');
+			await this.$store.dispatch('auth/logout');
 		}
 	}
 })

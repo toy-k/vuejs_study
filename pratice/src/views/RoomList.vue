@@ -92,7 +92,12 @@ export default {
 			let uploadFile;
 			
 			try {
-				uploadFile = (await axios(`http://localhost:8080/api/upload/roomId/${id}`)).data
+				uploadFile = (await axios(`http://localhost:8080/api/upload/roomId/${id}`))
+				if (uploadFile) {
+					uploadFile = uploadFile.data
+				} else { 
+					uploadFile=''
+				}
 
 			} catch (e) {
 				uploadFile = '';
@@ -100,8 +105,13 @@ export default {
 			
 			roomDetail['uploadFile'] = uploadFile.fileName
 
+			const roomList = await this.$store.getters['room/getRoomList'];
+			const room = roomList.find(room => room.id === id);
+			roomDetail['img'] = room.img;
+
 			await this.$store.dispatch('room/setRoom', roomDetail);
 			await this.$store.dispatch('room/setJoinedUserIds', joinedUserIds);
+			await this.getReviewFromServer(id);
 
 			this.$router.push(`/room-detail/${id}`);
 		},
@@ -123,14 +133,13 @@ export default {
 
 				console.log({ rooms, page })
 
-				let photos = (await axios("https://picsum.photos/v2/list?limit=33")).data; //array
+				let photos = (await axios("https://picsum.photos/v2/list?limit=110")).data; //array
 				let roomList = rooms.map((room, idx) => {
 					return {
-						...room, img: photos[idx].download_url,
+						...room, img: photos[idx*10].download_url,
 					}
 				})
 				await this.$store.dispatch('room/setRoomList', roomList);
-
 			} catch (e) {
 				return new Error("getRoomsFromServer error", e);
 			}
@@ -147,12 +156,40 @@ export default {
 				return new Error("getRoomCount error", e);
 			}
 		},
+		async getReviewFromServer(roomId) { 
+			try {
+				const response = (await axios.get(`http://localhost:8080/api/review/roomId/${roomId}`))
+				const review = response.data;
+				console.log({ review })
+
+				await this.$store.dispatch('review/setReviewList', review);
+
+			} catch (e) {
+				return new Error("getReview error", e);
+			}
+		},
 		goTocreateRoom() {
 			this.$router.push('/room-create');
 		},
+		async getUsersFromServer() { 
+			try {
+				const response = (await axios.get(`http://localhost:8080/fakeuser/all`))
+				let users = response.data;
+				users.map((user) => { 
+					user['profile'] = user['profile'] ? `data:image/jpeg;base64,${user.profile}` : ''
+				})
+				console.log({ users })
+
+				await this.$store.dispatch('user/setUserList', users);
+
+			} catch (e) {
+				return new Error("getUsersFromServer error", e);
+			}
+		}
 	},
 	beforeMount() {
 		this.getRoomsFromServer();
+		this.getUsersFromServer();
 
 	}
 };

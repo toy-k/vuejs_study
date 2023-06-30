@@ -33,7 +33,7 @@ const authModule = {
 		async auth(context, payload) {
 			const mode = payload.mode;
 			const userData = payload;
-			const expiresIn = + userData.expiresIn * 1000;
+			const expiresIn = + userData.expiresIn;
 			const expirationDate = new Date().getTime() + expiresIn;
 
 			localStorage.setItem('accessToken', userData.accessToken);

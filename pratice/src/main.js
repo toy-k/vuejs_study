@@ -4,13 +4,15 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
-
+import VueCookies from 'vue-cookies'
 loadFonts()
 
 const app = createApp(App);
 app.use(router)
 app.use(store)
 app.use(vuetify)
+app.use(VueCookies)
+
 
 const savedState = JSON.parse(localStorage.getItem('state'));
 console.log(savedState)
