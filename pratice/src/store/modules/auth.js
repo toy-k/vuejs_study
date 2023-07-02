@@ -8,6 +8,7 @@ const authModule = {
 			accessToken: null,
 			user: null,
 			didAutoLogout: false,
+			isAdmin: false,
 		}
 	},
 	mutations: {
@@ -17,6 +18,7 @@ const authModule = {
 			state.accessToken = payload.accessToken;
 			state.didAutoLogout = false;
 			state.user = payload.user;
+			state.isAdmin = payload.user.isAdmin;
 		},
 		setAutoLogout(state) {
 			state.didAutoLogout = true;
@@ -35,12 +37,12 @@ const authModule = {
 			const userData = payload;
 			const expiresIn = + userData.expiresIn;
 			const expirationDate = new Date().getTime() + expiresIn;
-
+			
 			localStorage.setItem('accessToken', userData.accessToken);
 			localStorage.setItem('userId', userData.userId);
 			localStorage.setItem('accessTokenExpiration', expirationDate);
 			localStorage.setItem('user', JSON.stringify(userData));
-
+	
 			timer = setTimeout(function () {
 				context.dispatch('autoLogout');
 			}, expiresIn);
@@ -49,7 +51,8 @@ const authModule = {
 				{
 				userId: userData.userId,
 				accessToken: userData.accessToken,
-				user:userData
+				user: userData,
+				
 				}
 			);
 		},
@@ -58,7 +61,7 @@ const authModule = {
 			const userId = localStorage.getItem('userId');
 			const accessTokenExpiration = localStorage.getItem('accessTokenExpiration');
 			const user = JSON.parse(localStorage.getItem('user'));
-
+	
 			const expiresIn = +accessTokenExpiration - new Date().getTime();
 			if (expiresIn < 0) {
 				return;
@@ -112,6 +115,7 @@ const authModule = {
 		getDidAutoLogout(state) { return state.didAutoLogout; },
 		isAuthenticated(state) { return !!state.accessToken; },
 		getUser(state) { return state.user; },
+		getIsAdmin(state) { return state.user.isAdmin; },
 
 	}
 }

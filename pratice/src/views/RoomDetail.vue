@@ -12,93 +12,111 @@
 
 		<v-card>
 			<v-row>
-				<v-col cols="12">
+				<v-col sm="6">
 					<v-img :src="getRoom().img" :alt="getRoom().title" height="300" width="100%"></v-img>
 				</v-col>
-				<v-col cols="12">
+				<v-col sm="6">
+				<v-card-title>
+					<h2>
+					{{ getRoom().title }}
+					</h2>
+					</v-card-title>
+				<v-card-subtitle class="mb-4">Category: {{ getRoom().category }}</v-card-subtitle>
+				<v-card-text>
+					<p>
+				{{ getRoom().description }}
+	
+					</p>
+				</v-card-text>
+				
+				
+					<v-divider class="my-4"></v-divider>
+					<v-card-text>
+					<h3>
+	참여 중인 유저
+					</h3>
+				</v-card-text>
+
+				<v-row>
+					<v-col v-for="(user, index) in getJoinedUserList()" :key="index"
+							@mouseover="showInfo" @mouseleave="hideInfo" cols="2">
+					<v-avatar class="avatar-container"  size="80">
+						<v-img :src="user.profile" :alt="`Participant ${index}`" @click="goToUserDetail(user.id)">
+							<div class="avatar-info" v-show="isShow">
+								{{ user.username }}
+							</div>
+						</v-img>
+					</v-avatar>
+					</v-col>					
+				</v-row>
+
+				<v-divider class="my-4"></v-divider>
+
+				<h3>미팅 정보</h3>
+
+				<v-row>
+					<v-col cols="12" sm="6">
+							<v-card-text class="font-weight-bold">				<v-icon>mdi-map-marker</v-icon>
+				Location</v-card-text>
+						<v-card-text>{{ getRoom().location }}</v-card-text>
+					</v-col>
+					<v-col cols="12" sm="6">
+						<v-card-text class="font-weight-bold">						<v-icon>mdi-clock</v-icon>
+	Meetup Start Date - Meetup End Date</v-card-text>
+						<v-card-text>{{ formatDate(getRoom().meetupStartDate) }} - {{ formatDate(getRoom().meetupEndDate) }}</v-card-text>
+					</v-col>
+				</v-row>
+				<v-row>
+					<v-col cols="12" sm="6">
+						<v-card-text><v-icon>mdi-account-group</v-icon> {{ getRoom().currentJoinNumber }} / {{ getRoom().maxJoinNumber }}</v-card-text>
+					</v-col>
+					<v-col cols="12" sm="6">
+						<v-card-text class="font-weight-bold">						<v-icon>mdi-cash</v-icon>
+	Price</v-card-text>
+						<v-card-text>{{ getRoom().price }}</v-card-text>
+					</v-col>
+				</v-row>
+
+				<v-row>
+					<v-col cols="12" sm="6">
+
+						<v-card-text class="font-weight-bold">
+													<v-icon :color="(getRoom().roomStatus == 'OPEN') ? 'green' : 'red'">
+								{{ (getRoom().roomStatus == 'OPEN') ? 'mdi-checkbox-marked-circle' : 'mdi-close-circle' }}
+						</v-icon>
+							{{ (getRoom().roomStatus == 'OPEN') ? 'OPEN':'CLOSE' }}
+						</v-card-text>
+
+					</v-col>
+					<v-col cols="12" sm="6">
+						<v-card-text>						<v-icon>{{ getRoom().roomType == 'ONLINE' ? 'mdi-earth' : 'mdi-map-marker' }}</v-icon>
+	{{ getRoom().roomType }}</v-card-text>
+					</v-col>
+					<v-col cols="12" sm="6">
+						<v-card-text>						<v-icon>mdi-eye</v-icon>
+{{ getRoom().viewCount }}</v-card-text>
+					</v-col>
+				</v-row>
+
+				<v-row>
+					<v-col cols="12">
+						<v-card-text class="font-weight-bold">
+						<h3>Host User ID</h3>	
+						</v-card-text>
+						<v-card-text>{{ getRoom().hostUserId }}</v-card-text>
+					</v-col>
+					<v-col cols="12">
+						<v-card-text class="font-weight-bold">upload file</v-card-text>
+						<v-card-text @click="downloadFile">{{ getRoom().uploadFile }}</v-card-text>
+					</v-col>
+					<v-col cols="6" sm="4">
+					</v-col>
+				</v-row>
 				</v-col>
 			</v-row>
 
 
-			<v-card-title>{{ getRoom().title }}</v-card-title>
-			<v-card-subtitle class="mb-4">Category: {{ getRoom().category }}</v-card-subtitle>
-			<v-card-text>{{ getRoom().description }}</v-card-text>
-			<v-divider class="my-4"></v-divider>
-			<v-card-text class="font-weight-bold">참여 중인 유저</v-card-text>
 
-			<div>
-				<v-avatar class="avatar-container" v-for="(user, index) in getJoinedUserList()" :key="index" size="80" @mouseover="showInfo" @mouseleave="hideInfo">
-					<v-img :src="user.profile"
-						:alt="`Participant ${index}`" >
-						<div class="avatar-info" v-show="isShow">
-							{{ user.username }}
-						</div>
-						</v-img>				
-				</v-avatar>
-
-			</div>
-
-			
-			<v-divider class="my-4"></v-divider>
-
-			<v-row>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Location</v-card-text>
-					<v-card-text>{{ getRoom().location }}</v-card-text>
-				</v-col>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Meetup Start Date</v-card-text>
-					<v-card-text>{{ formatDate(getRoom().meetupStartDate) }}</v-card-text>
-				</v-col>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Meetup End Date</v-card-text>
-					<v-card-text>{{ formatDate(getRoom().meetupEndDate) }}</v-card-text>
-				</v-col>
-			</v-row>
-			<v-divider class="my-4"></v-divider>
-			<v-row>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Max Join Number</v-card-text>
-					<v-card-text>{{ getRoom().maxJoinNumber }}</v-card-text>
-				</v-col>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Current Join Number</v-card-text>
-					<v-card-text>{{ getRoom().currentJoinNumber }}</v-card-text>
-				</v-col>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Price</v-card-text>
-					<v-card-text>{{ getRoom().price }}</v-card-text>
-				</v-col>
-			</v-row>
-			<v-divider class="my-4"></v-divider>
-			<v-row>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Room Status</v-card-text>
-					<v-card-text>{{ getRoom().roomStatus }}</v-card-text>
-				</v-col>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Room Type</v-card-text>
-					<v-card-text>{{ getRoom().roomType }}</v-card-text>
-				</v-col>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">View Count</v-card-text>
-					<v-card-text>{{ getRoom().viewCount }}</v-card-text>
-				</v-col>
-			</v-row>
-			<v-divider class="my-4"></v-divider>
-
-			<v-row>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">Host User ID</v-card-text>
-					<v-card-text>{{ getRoom().hostUserId }}</v-card-text>
-				</v-col>
-				<v-col cols="6" sm="4">
-					<v-card-text class="font-weight-bold">upload file</v-card-text>
-					<v-card-text @click="downloadFile">{{ getRoom().uploadFile }}</v-card-text>
-				</v-col>
-				<v-col cols="6" sm="4">
-				</v-col>
-			</v-row>
 		</v-card>
 
 		<v-spacer></v-spacer>
@@ -328,10 +346,16 @@ export default {
 				on.hide();
 			}, 2000);
 		},
-		showInfo() { 
+		showInfo() {
 			this.isShow = true;
-		}, hideInfo() { 
+		}, hideInfo() {
 			this.isShow = false;
+		},
+		async goToUserDetail(userId) {
+			let userList = await this.$store.getters['user/getUserList'];
+			let user = userList.find((user) => user.id === userId);
+			let userDetail = await this.$store.dispatch('user/setUser', user);
+			await this.$router.push(`/user-detail/${userId}`)
 		}
 
 	}
@@ -353,20 +377,21 @@ export default {
 }
 
 .avatar-info {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 8px 16px;
-  border-radius: 4px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 18px;
+	font-weight: bold;
+	color: white;
+	background-color: rgba(0, 0, 0, 0.7);
+	padding: 8px 16px;
+	border-radius: 4px;
 }
 
 .avatar-container {
-  margin-right: 10px; /* 원하는 간격 크기로 조정 */
+	margin-right: 10px;
+	/* 원하는 간격 크기로 조정 */
 	margin-left: 10px;
 }
 </style>

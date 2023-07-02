@@ -22,6 +22,10 @@ const routes = [
 			{ name: 'ServiceGuide', path: '/service-guide', component: () => import('@/views/ServiceGuide.vue'), },
 			{ name: 'SignIn', path: '/sign-in', component: () => import('@/views/SignIn.vue'), meta: {requestsUnAuth:true} },
 			{ name: 'UserDetail', path: '/user-detail/:id', component: () => import('@/views/UserDetail.vue'), },
+			{ name: 'Admin', path: '/admin', component: () => import('@/views/Admin.vue'), meta: { requestsAdmin: true } },
+			{ name: 'AnnounceList', path: '/announce-list', component: () => import('@/views/AnnounceList.vue'), },
+			{ name: 'AnnounceDetail', path: '/announce-detail/:id', component: () => import('@/views/AnnounceDetail.vue'), },
+			{ name: 'AnnounceCreate', path: '/announce-create', component: () => import('@/views/AnnounceCreate.vue'), meta: { requestsAdmin: true } },
 		
 			{ name: 'NotFound', path: '/:notFound(.*)', component: () => import('@/views/NotFound.vue'), }
 		],
@@ -34,7 +38,10 @@ const router = createRouter({
 })
 
 router.beforeEach(function (to, _, next) {
-	if (to.meta.requestsAuth && !store.getters['auth/isAuthenticated']) {
+	if (to.meta.requestsAdmin && !store.getters['auth/isAdmin']) {
+		// next('/main-page');
+		next();
+	}	else if (to.meta.requestsAuth && !store.getters['auth/isAuthenticated']) {
 		next('/sign-in');
 	} else if (to.meta.requestsUnAuth && store.getters['auth/isAuthenticated']) {
 		// next('/main-page')

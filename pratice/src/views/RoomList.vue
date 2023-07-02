@@ -35,7 +35,7 @@
 import axios from 'axios';
 
 export default {
-	name: 'BlogCard',
+	name: 'RoomList',
 
 	data: () => ({
 		categories: ['ALL','STUDY', 'TRAVEL', 'CODING', 'FOOD', 'GAME', 'CAFE', 'ALCHOLE', 'ACTIVITY', 'CULTURE', 'SPORTS', 'ETC'],

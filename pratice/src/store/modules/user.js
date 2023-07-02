@@ -7,7 +7,7 @@ const userModule= {
 		}
 	},
 	mutations: {
-		addUser(state, payload) {
+		setUser(state, payload) {
 			state.user = payload;
 		},
 		setUserList(state, payload) {
@@ -15,8 +15,8 @@ const userModule= {
 		}
 	},
 	actions: {
-		addUser(context, payload) {
-			context.commit('addUser', payload);
+		setUser(context, payload) {
+			context.commit('setUser', payload);
 		},
 		setUserList(context, payload) {
 			context.commit('setUserList', payload);
