@@ -193,6 +193,7 @@ export default {
 	beforeMount() {
 		this.getRoomsFromServer();
 		this.getUsersFromServer();
+		this.getRoomCount();
 
 	}
 };

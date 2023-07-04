@@ -63,11 +63,10 @@ export default {
 			const users = this.$store.getters['user/getUserList'] || [];
 			const result = this.$store.getters['review/getReviewList'] || [];
 
-			
 			result.map((review) => {
 				const user = users.find((u) => u.id === review.userId);
 				review.name = user ? user.username : 'Unknown';
-				review.profile = user.profile ? `data:image/jpeg;base64,${user.profile}` : '';
+				review.profile = user.profile;
 			});
 
 			return result
@@ -88,7 +87,6 @@ export default {
 		didWrited() { 
 			let user = this.$store.getters['auth/getUser'];
 			let joinedUserIds = this.$store.getters['room/getJoinedUserIds'];
-		
 			if (!user) {
 				return false;
 			}
@@ -98,7 +96,7 @@ export default {
 			let didWrited = reviewList.find((review) => {
 				return review.userId === user.id
 			})
-
+			
 			if(user.id in joinedUserIds){
 				if (didWrited) {
 					return false;

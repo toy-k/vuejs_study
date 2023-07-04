@@ -75,7 +75,7 @@ export default {
 				const data = {
 					"title": this.postData.title,
 					"description": this.postData.description,
-					"hostUserId": user.id
+					"userId": user.id
 				}
 
 

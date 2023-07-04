@@ -14,11 +14,16 @@ const authModule = {
 	mutations: {
 		setUser(state, payload) {
 			console.log("[setUser] ", payload);
+
 			state.userId = payload.userId;
 			state.accessToken = payload.accessToken;
 			state.didAutoLogout = false;
 			state.user = payload.user;
-			state.isAdmin = payload.user.isAdmin;
+			if (payload.user) { 
+				state.isAdmin = payload.user.roleType === 'ADMIN' ? true : false;
+			} else {
+				state.isAdmin = false;
+			}
 		},
 		setAutoLogout(state) {
 			state.didAutoLogout = true;
@@ -115,7 +120,7 @@ const authModule = {
 		getDidAutoLogout(state) { return state.didAutoLogout; },
 		isAuthenticated(state) { return !!state.accessToken; },
 		getUser(state) { return state.user; },
-		getIsAdmin(state) { return state.user.isAdmin; },
+		getIsAdmin(state) { return state.isAdmin; },
 
 	}
 }

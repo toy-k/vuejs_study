@@ -2,7 +2,6 @@
 	<v-container>
 		<v-card>
 			<v-card-actions>
-				<v-btn v-if="isHost" color="indigo-lighten-1" @click="editAnnounce">Edit</v-btn>
 				<v-btn v-if="isHost" color="red-darken-1" @click="deleteAnnounce">Delete</v-btn>
 			</v-card-actions>
 		</v-card>
@@ -36,7 +35,6 @@
 		</v-card>
 
 		<v-spacer></v-spacer>
-		<Review />
 	</v-container>
 </template>
 
@@ -50,15 +48,12 @@ export default {
 		};
 	},
 	components: {
-		Review
 	},
 	mounted() {
 	}, computed: {
 		isHost() {
-			let announce = this.$store.getters['announce/getAnnounce'];
-			let user = this.$store.getters['auth/getUser'];
-
-			if (!announce || !user || (announce.hostUserId !== user.id)) {
+			let isAdmin = this.$store.getters['auth/getIsAdmin'];
+			if (!isAdmin) {
 				// console.log("false")
 				return false;
 			} else {
@@ -74,9 +69,6 @@ export default {
 			return this.$store.getters['announce/getAnnounce'];
 
 		},
-		editAnnounce() {
-			this.$router.push(`/announce-update/${this.getAnnounce().id}`);
-		},
 		async deleteAnnounce() {
 			let announce = this.$store.getters['announce/getAnnounce'];
 			let accessToken = this.$store.getters['auth/getAccessToken'];
@@ -87,7 +79,7 @@ export default {
 				Authorization: `Bearer ${accessToken}`,
 			};
 			const data = {
-				id: announce.id,
+				announceId: announce.id,
 			}
 
 			await axios({

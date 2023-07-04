@@ -51,6 +51,17 @@ export default {
 	methods: {
 		getUserFromServer() {
 			const userDetail = this.$store.getters['user/getUser'];
+			if (!userDetail) { 
+
+				const tem = {
+					profile : "https://cdn.vuetifyjs.com/images/lists/1.jpg", 
+					email : "tem@tem", 
+					username : "tem", 
+					description : "tem"
+
+				}
+				return tem
+			}
 			return userDetail
 		},
 

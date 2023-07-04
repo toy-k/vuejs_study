@@ -76,6 +76,12 @@ export default {
 					icon: "mdi-table",
 					to: "/user-detail/1"
 
+				},
+				{
+					title: "AnnounceList",
+					icon: "mdi-table",
+					to: "/announce-list"
+
 				}
 			]
 		}

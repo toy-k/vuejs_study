@@ -20,6 +20,8 @@
 
 				<v-col cols="6" sm="6">
 					<h2>Server FAKEUSER</h2>
+					<v-btn color="error" @click="getFakeUserFromServer(6)">Fake Admin User</v-btn>
+					<v-spacer></v-spacer>
 					<v-btn v-for="(i, idx) in 5" :key="idx" color="secondary" @click="getFakeUserFromServer(i)">Fake User {{ i
 					}}</v-btn>
 					<v-spacer></v-spacer>
@@ -86,15 +88,12 @@ export default {
 			console.log('Logging in with Kakao');
 		},
 		async socialLogin() {
-			console.log("[socialLogin] 1")
 			const user = await this.$store.getters['auth/getUser'];
 			
-			console.log({user})
+			// console.log({user})
 			if (user) {
 				return;
 			}
-
-			console.log("[socialLogin] 2")
 
 			const accessToken = this.$cookies.get('AccessToken');
 			const headers = {

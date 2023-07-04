@@ -38,7 +38,8 @@ const router = createRouter({
 })
 
 router.beforeEach(function (to, _, next) {
-	if (to.meta.requestsAdmin && !store.getters['auth/isAdmin']) {
+	console.log("[router.beforeEach] to: ", store.getters['auth/getIsAdmin'])
+	if (to.meta.requestsAdmin && !store.getters['auth/getIsAdmin']) {
 		// next('/main-page');
 		next();
 	}	else if (to.meta.requestsAuth && !store.getters['auth/isAuthenticated']) {

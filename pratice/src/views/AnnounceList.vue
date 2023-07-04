@@ -1,7 +1,8 @@
 <template>
 	<v-container>
+		<h1>Announce</h1>
 		<v-row>
-			<v-btn v-if="isLoggedIn" fab fixed right top color="primary" class="ma-4" @click="goTocreateAnnounce">
+			<v-btn v-if="isAdmin" fab fixed right top color="primary" class="ma-4" @click="goTocreateAnnounce">
 				<v-icon>mdi-plus</v-icon>
 			</v-btn>
 
@@ -62,8 +63,8 @@ export default {
 		getAnnounceListData() {
 			return this.$store.getters['announce/getAnnounceList'];
 		},
-		isLoggedIn() {
-			return this.$store.getters['auth/isAuthenticated'];
+		isAdmin() {
+			return (this.$store.getters['auth/isAuthenticated'] && this.$store.getters['auth/getIsAdmin']);
 		}
 
 
@@ -74,7 +75,7 @@ export default {
 			let announceDetail = (await axios(`http://localhost:8080/api/announce/id/${id}`)).data
 
 			const announceList = await this.$store.getters['announce/getAnnounceList'];
-			const announce = AnnounceList.find(Announce => Announce.id === id);
+			const announce = announceList.find(Announce => Announce.id === id);
 			announceDetail['img'] = announce.img;
 
 			await this.$store.dispatch('announce/setAnnounce', announceDetail);
@@ -95,10 +96,10 @@ export default {
 
 				console.log({ announces, page })
 
-				let photos = (await axios("https://picsum.photos/v2/list?limit=110")).data; //array
+				let photos = (await axios("https://picsum.photos/v2/list?limit=150")).data; //array
 				let announceList = announces.map((announce, idx) => {
 					return {
-						...announce, img: photos[idx * 10].download_url,
+						...announce, img: photos[idx * 11].download_url,
 					}
 				})
 				await this.$store.dispatch('announce/setAnnounceList', announceList);
@@ -121,28 +122,11 @@ export default {
 		goTocreateAnnounce() {
 			this.$router.push('/announce-create');
 		},
-		async getUsersFromServer() {
-			try {
-				const response = (await axios.get(`http://localhost:8080/fakeuser/all`))
-				let users = response.data;
-
-				users.map(async (user) => {
-					let imageData = (await axios.get(`https://jsonplaceholder.typicode.com/photos?id=${user.id}`)).data
-					user['profile'] = user['profile'] ? `data:image/jpeg;base64,${user.profile}` : imageData[0].url
-				})
-				console.log({ users })
-
-				await this.$store.dispatch('user/setUserList', users);
-
-			} catch (e) {
-				return new Error("getUsersFromServer error", e);
-			}
-		},
 
 	},
 	beforeMount() {
 		this.getAnnouncesFromServer();
-		this.getUsersFromServer();
+		this.getAnnounceCount();
 
 	}
 };

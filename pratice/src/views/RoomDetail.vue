@@ -99,11 +99,17 @@
 				</v-row>
 
 				<v-row>
-					<v-col cols="12">
+					<v-col cols="12" @mouseover="showInfo" @mouseleave="hideInfo">
 						<v-card-text class="font-weight-bold">
 						<h3>Host User ID</h3>	
 						</v-card-text>
-						<v-card-text>{{ getRoom().hostUserId }}</v-card-text>
+							<v-avatar class="avatar-container"  size="80">
+							<v-img :src="getHostUser().profile" :alt="`Participant`" @click="goToUserDetail(getHostUser().id)">
+								<div class="avatar-info" v-show="isShow">
+									{{ getHostUser().username }}
+								</div>
+							</v-img>
+						</v-avatar>
 					</v-col>
 					<v-col cols="12">
 						<v-card-text class="font-weight-bold">upload file</v-card-text>
@@ -139,8 +145,9 @@ export default {
 		Review
 	},
 	mounted() {
-		// this.getRoom();
-		// this.getReviewListApi();
+		if (!this.getRoom()) { 
+			this.$router.push('/main-page');
+		}
 	}, computed: {
 		isHost() {
 			let room = this.$store.getters['room/getRoom'];
@@ -330,6 +337,9 @@ export default {
 
 			//유저들 중 방에 참여중인 유저 정보를 joinedUserList에 넣는다.
 			for (let i = 0; i < userList.length; i++) {
+				if(userList[i].id === room.hostUserId){
+					continue;
+				}
 				if (joinedUserIds.includes(userList[i].id)) {
 					joinedUserList.push(userList[i])
 
@@ -337,6 +347,18 @@ export default {
 			}
 			console.log({ joinedUserList })
 			return joinedUserList
+		}, getHostUser() { 
+			let room = this.$store.getters['room/getRoom'];
+			let userList = this.$store.getters['user/getUserList'];
+			let hostUser;
+
+			if (!room || !userList) {
+				return null;
+			}
+
+			hostUser = userList.find((user) => user.id === room.hostUserId);
+
+			return hostUser;
 		},
 		showUsernamePopup(username, on) {
 			on.show();
