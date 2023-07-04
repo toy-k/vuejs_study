@@ -1,37 +1,68 @@
 <template>
-	<v-container>
-		<h1>Login</h1>
-		<v-card>
-			<v-divider class="my-4"></v-divider>
 
+
+	<v-container>
+		<h1 class="page-title">로그인</h1>
+			
+
+		<v-card>
+		
 			<v-row>
 				<v-col cols="6" sm="6">
-					<h2>Social Login</h2>
-					<v-card-text>
-						<v-btn color="primary" @click="loginWithGoogle">
-								Login with Google
-						</v-btn>
-						<v-spacer></v-spacer>
-						<v-btn color="primary" @click="loginWithKakao">
-							Login with Kakao
-						</v-btn>
-				</v-card-text>
-				</v-col>
-
+		<v-img
+		  :width="500"
+			:height="800"
+		  aspect-ratio="16/9"
+		  cover
+		  src="https://cdn.vuetifyjs.com/images/parallax/material.jpg"
+		></v-img>
+					</v-col>
 				<v-col cols="6" sm="6">
-					<h2>Server FAKEUSER</h2>
-					<v-btn color="error" @click="getFakeUserFromServer(6)">Fake Admin User</v-btn>
-					<v-spacer></v-spacer>
-					<v-btn v-for="(i, idx) in 5" :key="idx" color="secondary" @click="getFakeUserFromServer(i)">Fake User {{ i
-					}}</v-btn>
-					<v-spacer></v-spacer>
-					<v-btn color="primary" @click="checkFakeUser">Check Fake User</v-btn>
-					<v-spacer></v-spacer>
-					<v-btn color="error" @click="logout">Logout</v-btn>
+												<br>
+					<br>
+					<br>
+				<h2>Social Login</h2><br>
+						<v-card-text>
+									<v-btn color="primary" @click="loginWithGoogle">
+									Login with Google
+							</v-btn>
+		<br>
+		<br>
+								<v-btn color="primary" @click="loginWithKakao">
+								Login with Kakao
+							</v-btn>
+					</v-card-text>
+					<br>
+					<br>
+					<br>
+						<br>
+							<v-divider class="my-4"></v-divider>
+
+						<br>
+						<br>
+							<br>
+						<h2>Test User Login</h2>
+						<br>
+								<br>
+							<v-btn color="error" @click="getFakeUserFromServer(6)">ADMIN USER</v-btn>
+							<v-spacer></v-spacer>
+							<br>
+							<v-btn v-for="(i, idx) in 5" :key="idx" color="secondary" @click="getFakeUserFromServer(i)">TEST User {{ i
+							}}</v-btn>
+							<v-spacer></v-spacer>
+							<!-- <v-btn color="primary" @click="checkFakeUser">Check Fake User</v-btn>
+						<v-spacer></v-spacer>
+						<v-btn color="error" @click="logout">Logout</v-btn> -->
+							<br>
+
 				</v-col>
 			</v-row>
 
 		</v-card>
+
+		<br>
+			<br>
+
 	</v-container>
 </template>
 
@@ -39,7 +70,18 @@
 import axios from 'axios';
 
 export default {
+		computed: {
+	},
+
 	methods: {
+				isLoggedIn() {
+			const isLoggedIn = this.$store.getters['auth/isAuthenticated']
+			if (isLoggedIn) {
+				this.$router.push('/main-page')
+			}
+			return isLoggedIn;
+		},
+
 		async getFakeUserFromServer(userId) {
 			try {
 				const response = (await axios.get(`http://localhost:8080/fakeuser/fakeuser${userId}`, { withCredentials: true }))
@@ -61,6 +103,8 @@ export default {
 				await this.$store.dispatch('auth/login', fakeUser);
 
 				this.$cookies.set('AccessToken', '');
+						this.isLoggedIn();
+
 			} catch (e) {
 				return new Error("fakeuser api from server = ", e);
 			}
@@ -134,7 +178,7 @@ export default {
 	created() {
 		console.log("[craeted]")
 				this.socialLogin();
-
+		this.isLoggedIn();
 	},
 };
 </script>

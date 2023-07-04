@@ -1,6 +1,8 @@
 <template>
 	<v-container>
-		<h1>User detail</h1>
+			
+
+		<h1 class="page-title">유저 정보</h1>
 
 		<v-card color="">
 			<v-row>

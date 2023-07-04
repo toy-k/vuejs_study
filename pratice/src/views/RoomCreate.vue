@@ -1,6 +1,9 @@
 <template>
 	<v-container>
-		<h1>Write a New Post</h1>
+			
+
+		<h1 class="page-title">모임 생성</h1>
+		<br>
 		<v-card>
 			<v-card-text>
 				<v-form ref="form" @submit.prevent="submitForm" @validate="isValidateForm">

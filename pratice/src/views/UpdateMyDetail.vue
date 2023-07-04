@@ -1,6 +1,8 @@
 <template>
 	<v-container>
-		<h1>Update My Profile</h1>
+			
+
+		<h1 class="page-title">Update My Profile</h1>
 
 		<v-card color="">
 			<v-row>

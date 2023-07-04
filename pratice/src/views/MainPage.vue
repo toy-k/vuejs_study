@@ -1,12 +1,12 @@
 <template>
-	<v-row>
-		<v-col cols="6" sm="6">
-			<BlogCard></BlogCard>
-		</v-col>
-		<v-col cols="6" sm="6">
+	
+
+		<v-row>
+			<v-col cols="12">
 				<BlogCard></BlogCard>
 			</v-col>
-	</v-row>
+		</v-row>
+
 </template>
 
 <script>
@@ -30,3 +30,15 @@ import BlogCard from './dashboard/dashboardComponents/blog-card/BlogCard.vue'
 	}
 }
 </script>
+
+<style>
+</style>
+
+
+<!-- primary
+secondary
+accent
+success
+info
+warning
+error -->

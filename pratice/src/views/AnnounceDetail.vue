@@ -1,5 +1,8 @@
 <template>
 	<v-container>
+			
+
+		<h1 class="page-title">공지사항 상세페이지</h1>
 		<v-card>
 			<v-card-actions>
 				<v-btn v-if="isHost" color="red-darken-1" @click="deleteAnnounce">Delete</v-btn>
@@ -9,7 +12,7 @@
 		<v-card>
 			<v-row>
 				<v-col sm="6">
-					<v-img :src="getAnnounce().img" :alt="getAnnounce().title" height="300" width="100%"></v-img>
+					<v-img :src="getAnnounce().img" :alt="getAnnounce().title" height="800" width="100%"></v-img>
 				</v-col>
 				<v-col sm="6">
 					<v-card-title>

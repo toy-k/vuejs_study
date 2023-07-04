@@ -34,7 +34,7 @@
 			</v-menu>
 		</div>
 		<div v-else>
-			<v-btn color="error" class="mr-4" to="/sign-in">sign in</v-btn>
+			<v-btn color="black" class="mr-4" to="/sign-in">sign in</v-btn>
 		</div>
 
 
@@ -55,58 +55,29 @@ export default ({
 			},
 		],
 		items: [
-			{
+				{
 				title: "MainPage",
 				icon: "mdi-view-dashboard-outline",
 				to: "/main-page",
 			},
 			{
-				title: "RoomList",
-				icon: "mdi-alert-circle-outline",
+				title: "MeetUp List",
+				icon: "mdi-account-group",
 				to: "/room-list"
 
 			},
 			{
-				title: "RoomDetail",
-				icon: "mdi-radiobox-blank",
-				to: "/room-detail/1"
-
-			},
-			{
-				title: "RoomCreate",
-				icon: "mdi-card-outline",
-				to: "/room-create"
-
-			},
-			{
-				title: "Mydetail",
-				icon: "mdi-form-dropdown",
-				to: "/my-detail"
-
-			},
-			{
-				title: "QnA",
+				title: "AnnounceList",
 				icon: "mdi-table",
-				to: "/qna"
+				to: "/announce-list"
 
 			},
 			{
-				title: "ServiceGuide",
-				icon: "mdi-table",
-				to: "/service-guide"
-			},
-			{
-				title: "SignIn",
-				icon: "mdi-table",
-				to: "/sign-in"
+				title: "FAQ",
+				icon: "mdi-alert-circle-outline",
+				to: "/faq"
 
 			},
-			{
-				title: "UserDetail",
-				icon: "mdi-table",
-				to: "/user-detail/1"
-
-			}
 		]
 	}),
 	computed: {

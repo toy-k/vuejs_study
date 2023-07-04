@@ -1,5 +1,8 @@
 <template>
 	<v-container>
+			
+
+		<h1 class="page-title">모임 상세페이지</h1>
 		<v-card>
 			<v-card-actions>
 				<v-btn v-if="isJoined" color="teal-lighten-1" @click="joinRoom">Join</v-btn>
@@ -13,111 +16,112 @@
 		<v-card>
 			<v-row>
 				<v-col sm="6">
-					<v-img :src="getRoom().img" :alt="getRoom().title" height="300" width="100%"></v-img>
+					<v-img :src="getRoom().img" :alt="getRoom().title" height="800" width="100%"></v-img>
 				</v-col>
 				<v-col sm="6">
-				<v-card-title>
-					<h2>
-					{{ getRoom().title }}
-					</h2>
+					<v-card-title>
+						<h2>
+							{{ getRoom().title }}
+						</h2>
 					</v-card-title>
-				<v-card-subtitle class="mb-4">Category: {{ getRoom().category }}</v-card-subtitle>
-				<v-card-text>
-					<p>
-				{{ getRoom().description }}
-	
-					</p>
-				</v-card-text>
-				
-				
+					<v-card-subtitle class="mb-4">Category: {{ getRoom().category }}</v-card-subtitle>
+					<v-card-text>
+						<p>
+							{{ getRoom().description }}
+
+						</p>
+					</v-card-text>
+
+
 					<v-divider class="my-4"></v-divider>
 					<v-card-text>
-					<h3>
-	참여 중인 유저
-					</h3>
-				</v-card-text>
+						<h3>
+							참여 중인 유저
+						</h3><br>
+					</v-card-text>
 
-				<v-row>
-					<v-col v-for="(user, index) in getJoinedUserList()" :key="index"
-							@mouseover="showInfo" @mouseleave="hideInfo" cols="2">
-					<v-avatar class="avatar-container"  size="80">
-						<v-img :src="user.profile" :alt="`Participant ${index}`" @click="goToUserDetail(user.id)">
-							<div class="avatar-info" v-show="isShow">
-								{{ user.username }}
-							</div>
-						</v-img>
-					</v-avatar>
-					</v-col>					
-				</v-row>
+					<v-row>
+						<v-col v-for="(user, index) in getJoinedUserList()" :key="index" @mouseover="showInfo" @mouseleave="hideInfo"
+							cols="2">
+							<v-avatar class="avatar-container" size="80">
+								<v-img :src="user.profile" :alt="`Participant ${index}`" @click="goToUserDetail(user.id)">
+									<div class="avatar-info" v-show="isShow">
+										{{ user.username }}
+									</div>
+								</v-img>
+							</v-avatar>
+						</v-col>
+					</v-row>
 
-				<v-divider class="my-4"></v-divider>
+					<v-divider class="my-4"></v-divider>
 
-				<h3>미팅 정보</h3>
+					<h3>모임 정보</h3>
 
-				<v-row>
-					<v-col cols="12" sm="6">
-							<v-card-text class="font-weight-bold">				<v-icon>mdi-map-marker</v-icon>
-				Location</v-card-text>
-						<v-card-text>{{ getRoom().location }}</v-card-text>
-					</v-col>
-					<v-col cols="12" sm="6">
-						<v-card-text class="font-weight-bold">						<v-icon>mdi-clock</v-icon>
-	Meetup Start Date - Meetup End Date</v-card-text>
-						<v-card-text>{{ formatDate(getRoom().meetupStartDate) }} - {{ formatDate(getRoom().meetupEndDate) }}</v-card-text>
-					</v-col>
-				</v-row>
-				<v-row>
-					<v-col cols="12" sm="6">
-						<v-card-text><v-icon>mdi-account-group</v-icon> {{ getRoom().currentJoinNumber }} / {{ getRoom().maxJoinNumber }}</v-card-text>
-					</v-col>
-					<v-col cols="12" sm="6">
-						<v-card-text class="font-weight-bold">						<v-icon>mdi-cash</v-icon>
-	Price</v-card-text>
-						<v-card-text>{{ getRoom().price }}</v-card-text>
-					</v-col>
-				</v-row>
+					<v-row>
+						<v-col cols="12" sm="6">
+							<v-card-text class="font-weight-bold"> <v-icon>mdi-map-marker</v-icon>
+								장소</v-card-text>
+							<v-card-text>{{ getRoom().location }}</v-card-text>
+						</v-col>
+						<v-col cols="12" sm="6">
+							<v-card-text class="font-weight-bold"> <v-icon>mdi-clock</v-icon>
+								모임 시작 - 모임 끝</v-card-text>
+							<v-card-text>{{ formatDate(getRoom().meetupStartDate) }} - {{ formatDate(getRoom().meetupEndDate)
+							}}</v-card-text>
+						</v-col>
+					</v-row>
+					<v-row>
+						<v-col cols="12" sm="6">
+							<v-card-text><v-icon>mdi-account-group</v-icon> {{ getRoom().currentJoinNumber }} / {{
+								getRoom().maxJoinNumber }}</v-card-text>
+						</v-col>
+						<v-col cols="12" sm="6">
+							<v-card-text class="font-weight-bold"> <v-icon>mdi-cash</v-icon>
+								참여비 [ {{ formatCurrency(getRoom().price) }} ] </v-card-text>
+						</v-col>
+					</v-row>
 
-				<v-row>
-					<v-col cols="12" sm="6">
+					<v-row>
+						<v-col cols="12" sm="6">
 
-						<v-card-text class="font-weight-bold">
-													<v-icon :color="(getRoom().roomStatus == 'OPEN') ? 'green' : 'red'">
-								{{ (getRoom().roomStatus == 'OPEN') ? 'mdi-checkbox-marked-circle' : 'mdi-close-circle' }}
-						</v-icon>
-							{{ (getRoom().roomStatus == 'OPEN') ? 'OPEN':'CLOSE' }}
-						</v-card-text>
+							<v-card-text class="font-weight-bold">
+								<v-icon :color="(getRoom().roomStatus == 'OPEN') ? 'green' : 'red'">
+									{{ (getRoom().roomStatus == 'OPEN') ? 'mdi-checkbox-marked-circle' : 'mdi-close-circle' }}
+								</v-icon>
+								{{ (getRoom().roomStatus == 'OPEN') ? 'OPEN' : 'CLOSE' }}
+							</v-card-text>
 
-					</v-col>
-					<v-col cols="12" sm="6">
-						<v-card-text>						<v-icon>{{ getRoom().roomType == 'ONLINE' ? 'mdi-earth' : 'mdi-map-marker' }}</v-icon>
-	{{ getRoom().roomType }}</v-card-text>
-					</v-col>
-					<v-col cols="12" sm="6">
-						<v-card-text>						<v-icon>mdi-eye</v-icon>
-{{ getRoom().viewCount }}</v-card-text>
-					</v-col>
-				</v-row>
+						</v-col>
+						<v-col cols="12" sm="6">
+							<v-card-text> <v-icon>{{ getRoom().roomType == 'ONLINE' ? 'mdi-earth' : 'mdi-map-marker' }}</v-icon>
+								{{ getRoom().roomType }}</v-card-text>
+						</v-col>
+						<v-col cols="12" sm="6">
+							<v-card-text> <v-icon>mdi-eye</v-icon>
+								{{ getRoom().viewCount }}</v-card-text>
+						</v-col>
+					</v-row>
 
-				<v-row>
-					<v-col cols="12" @mouseover="showInfo" @mouseleave="hideInfo">
-						<v-card-text class="font-weight-bold">
-						<h3>Host User ID</h3>	
-						</v-card-text>
-							<v-avatar class="avatar-container"  size="80">
-							<v-img :src="getHostUser().profile" :alt="`Participant`" @click="goToUserDetail(getHostUser().id)">
-								<div class="avatar-info" v-show="isShow">
-									{{ getHostUser().username }}
-								</div>
-							</v-img>
-						</v-avatar>
-					</v-col>
-					<v-col cols="12">
-						<v-card-text class="font-weight-bold">upload file</v-card-text>
-						<v-card-text @click="downloadFile">{{ getRoom().uploadFile }}</v-card-text>
-					</v-col>
-					<v-col cols="6" sm="4">
-					</v-col>
-				</v-row>
+					<v-row>
+						<v-col cols="12" @mouseover="showInfo" @mouseleave="hideInfo">
+							<v-card-text class="font-weight-bold">
+								<h3>모임 주최자</h3>
+							</v-card-text>
+							<v-avatar class="avatar-container" size="80">
+								<v-img :src="getHostUser().profile" :alt="`Participant`" @click="goToUserDetail(getHostUser().id)">
+									<div class="avatar-info" v-show="isShow">
+										{{ getHostUser().username }}
+									</div>
+								</v-img>
+							</v-avatar>
+						</v-col>
+						<v-col cols="12">
+							<v-card-text class="font-weight-bold">첨부파일</v-card-text>
+							<v-card-text @click="downloadFile">{{ getRoom().uploadFile }}</v-card-text>
+						</v-col>
+						<v-col cols="6" sm="4">
+						</v-col>
+					</v-row>
 				</v-col>
 			</v-row>
 
@@ -145,7 +149,7 @@ export default {
 		Review
 	},
 	mounted() {
-		if (!this.getRoom()) { 
+		if (!this.getRoom()) {
 			this.$router.push('/main-page');
 		}
 	}, computed: {
@@ -200,8 +204,13 @@ export default {
 	},
 	methods: {
 		formatDate(dateString) {
-			const options = { year: 'numeric', month: 'long', day: 'numeric' };
+			const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+
 			return new Date(dateString).toLocaleDateString(undefined, options);
+		},
+		formatCurrency(number) {
+			const formattedNumber = new Intl.NumberFormat().format(number);
+			return `${formattedNumber} 원`;
 		},
 		getRoom() {
 			const roomId = this.$route.params.id;
@@ -337,7 +346,7 @@ export default {
 
 			//유저들 중 방에 참여중인 유저 정보를 joinedUserList에 넣는다.
 			for (let i = 0; i < userList.length; i++) {
-				if(userList[i].id === room.hostUserId){
+				if (userList[i].id === room.hostUserId) {
 					continue;
 				}
 				if (joinedUserIds.includes(userList[i].id)) {
@@ -347,12 +356,14 @@ export default {
 			}
 			console.log({ joinedUserList })
 			return joinedUserList
-		}, getHostUser() { 
+		},
+		getHostUser() {
 			let room = this.$store.getters['room/getRoom'];
 			let userList = this.$store.getters['user/getUserList'];
 			let hostUser;
 
 			if (!room || !userList) {
+				this.$router.push("/main-page")
 				return null;
 			}
 

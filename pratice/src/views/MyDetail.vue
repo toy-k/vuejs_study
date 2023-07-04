@@ -1,6 +1,8 @@
 <template>
 	<v-container>
-		<h1>My Profile</h1>
+			
+
+		<h1 class="page-title">내 정보</h1>
 	
 			<v-card color="">
 				<v-row>

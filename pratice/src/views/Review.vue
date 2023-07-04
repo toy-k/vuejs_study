@@ -1,7 +1,7 @@
 <template>
 	<v-card>
 		<v-card-actions>
-			<v-card-title>Reviews</v-card-title>
+			<v-card-title>모임 후기</v-card-title>
 			<!-- <v-spacer></v-spacer> -->
 			<!-- <v-btn color="primary" @click="createReview">Create Review</v-btn> -->
 		</v-card-actions>
@@ -31,7 +31,7 @@
 								<v-btn v-if="isWriter(review.userId)" color="pink-lighten-4" @click="deleteReview(review.id)">Delete</v-btn>
 				</v-col>
 				</v-row>
-
+	<br>
 			</v-list-item>
 
 			<ReviewCretae v-if="didWrited()"/>

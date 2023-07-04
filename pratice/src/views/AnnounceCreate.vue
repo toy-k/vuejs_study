@@ -1,6 +1,8 @@
 <template>
 	<v-container>
-		<h1>Write a New Announce</h1>
+			
+
+		<h1 class="page-title">Write a New Announce</h1>
 		<v-card>
 			<v-card-text>
 				<v-form ref="form" @submit.prevent="submitForm" @validate="isValidateForm">

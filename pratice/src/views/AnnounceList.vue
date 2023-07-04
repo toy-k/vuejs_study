@@ -1,6 +1,8 @@
 <template>
 	<v-container>
-		<h1>Announce</h1>
+			
+
+		<h1 class="page-title">공지사항</h1><br>
 		<v-row>
 			<v-btn v-if="isAdmin" fab fixed right top color="primary" class="ma-4" @click="goTocreateAnnounce">
 				<v-icon>mdi-plus</v-icon>
@@ -9,14 +11,15 @@
 		</v-row>
 		<v-row>
 			<v-col cols="12" sm="6" md="4" lg="3" xl="2" v-for="(d, idx) in paginatedAnnounces" :key="idx">
-				<v-card>
+				<v-card @click="goToAnnounceDetail(d.id)">
 					<v-img style="width: 100%" :src="d.img" />
 					<v-card-text>
 						<h5 class="title font-weight-medium mb-2 text-h6">
 							{{ d.title }}
 						</h5>
 						<p class="mb-3 text-body-2 text-grey-darken-1">{{ d.desc }}</p>
-						<v-btn depressed color="warning" @click="goToAnnounceDetail(d.id)">Learn More</v-btn>
+							<p>{{ formatDate(d.createdAt) }}</p>
+
 					</v-card-text>
 				</v-card>
 			</v-col>
@@ -70,6 +73,12 @@ export default {
 
 	},
 	methods: {
+						formatDate(dateString) {
+			const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
+			return new Date(dateString).toLocaleDateString(undefined, options);
+		},
+
 		async goToAnnounceDetail(id) {
 
 			let announceDetail = (await axios(`http://localhost:8080/api/announce/id/${id}`)).data
@@ -96,10 +105,10 @@ export default {
 
 				console.log({ announces, page })
 
-				let photos = (await axios("https://picsum.photos/v2/list?limit=150")).data; //array
+				let photos = (await axios("https://picsum.photos/v2/list?limit=180")).data; //array
 				let announceList = announces.map((announce, idx) => {
 					return {
-						...announce, img: photos[idx * 11].download_url,
+						...announce, img: photos[(idx+1) * 15].download_url,
 					}
 				})
 				await this.$store.dispatch('announce/setAnnounceList', announceList);

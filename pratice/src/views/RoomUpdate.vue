@@ -1,6 +1,8 @@
 <template>
 	<v-container>
-		<h1>Edit Post</h1>
+			
+
+		<h1 class="page-title">Edit Post</h1>
 		<v-card>
 			<v-card-text>
 				<v-form ref="form" @submit.prevent="submitForm" @validate="isValidateForm">

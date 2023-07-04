@@ -1,33 +1,39 @@
 <template>
-	
+		
+
 	<v-container>
+				<h1 class="page-title">모임 목록</h1><br>
 		<v-row>
 				<v-btn v-if="isLoggedIn" fab fixed right top color="primary" class="ma-4" @click="goTocreateRoom">
 				    <v-icon>mdi-plus</v-icon>
 				  </v-btn>
 
 			<v-col cols="12">
-				<v-btn v-for="category in categories" :key="category" class="mr-2 mb-2" color="purple-lighten-5"
+				<v-btn v-for="category in categories" :key="category" class="mr-2 mb-2" color="white"
 					@click="filterByCategory(category)">
 					{{ category }}
 				</v-btn>
 			</v-col>
 		</v-row>
-		<v-row>
+		<br>
+			<v-row>
 			<v-col cols="12" sm="6" md="4" lg="3" xl="2" v-for="(d, idx) in paginatedRooms" :key="idx">
-				<v-card>
+				<v-card @click="goToRoomDetail(d.id)" >
 					<v-img style="width: 100%" :src="d.img" />
 					<v-card-text>
 						<h5 class="title font-weight-medium mb-2 text-h6">
 							{{ d.title }}
 						</h5>
 						<p class="mb-3 text-body-2 text-grey-darken-1">{{ d.desc }}</p>
-						<v-btn depressed color="warning" @click="goToRoomDetail(d.id)">Learn More</v-btn>
+						<p>{{formatDate(d.createdAt)}}</p>
+
 					</v-card-text>
 				</v-card>
 			</v-col>
 		</v-row>
-		<v-pagination v-model="currentPage" :length="totalPages" color="primary"></v-pagination>
+		<br>
+		<br>
+		<v-pagination v-model="currentPage" :length="totalPages" ></v-pagination>
 	</v-container>
 </template>
 
@@ -82,6 +88,12 @@ export default {
 
 	},
 	methods: {
+				formatDate(dateString) {
+			const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
+			return new Date(dateString).toLocaleDateString(undefined, options);
+		},
+
 		async goToRoomDetail(id) {
 
 			let roomDetail = (await axios(`http://localhost:8080/api/room/id/${id}`)).data
