@@ -73,7 +73,7 @@ export default {
 		},
 		isWriter(userId) {
 			let user = this.$store.getters['auth/getUser'];
-
+	
 			if (!user) {
 				return false;
 			}
@@ -87,17 +87,19 @@ export default {
 		didWrited() { 
 			let user = this.$store.getters['auth/getUser'];
 			let joinedUserIds = this.$store.getters['room/getJoinedUserIds'];
+
 			if (!user) {
 				return false;
 			}
-
+	
 			let reviewList = this.$store.getters['review/getReviewList'];
 
 			let didWrited = reviewList.find((review) => {
 				return review.userId === user.id
 			})
+
 			
-			if(user.id in joinedUserIds){
+			if(joinedUserIds.includes(user.id)){
 				if (didWrited) {
 					return false;
 				} else {

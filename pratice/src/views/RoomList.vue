@@ -185,7 +185,7 @@ export default {
 		},
 		async getUsersFromServer() { 
 			try {
-				const response = (await axios.get(`http://localhost:8080/fakeuser/all`))
+				const response = (await axios.get(`http://localhost:8080/api/user/list`))
 				let users = response.data;
 
 				users.map(async (user) => { 
